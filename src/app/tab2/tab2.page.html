@@ -1,17 +1,20 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Transaksi
-    </ion-title>
+  <ion-toolbar color="orange">
+    <ion-buttons slot="start" class="ion-padding-start">
+      <ion-segment [value]="segmentTarget" mode="ios" class="mini-segment" (ionChange)="segmentChanged($event)">
+        <ion-segment-button value="order">
+          Pemesanan
+        </ion-segment-button>
+
+        <ion-segment-button value="selling">
+          Penjualan
+        </ion-segment-button>
+      </ion-segment>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Transaksi</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <app-explore-container name="Transaksi page"></app-explore-container>
+  <app-segment-order-page *ngIf="segmentTarget === 'order'"></app-segment-order-page>
+  <app-segment-selling-page *ngIf="segmentTarget === 'selling'"></app-segment-selling-page>
 </ion-content>

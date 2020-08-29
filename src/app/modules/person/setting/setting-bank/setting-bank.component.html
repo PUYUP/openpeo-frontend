@@ -1,0 +1,40 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="orange">
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>No. Rekening</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div *ngIf="isLoading" class="flex w-full p-3">
+    <ion-spinner class="ml-auto mr-auto"></ion-spinner>
+  </div>
+
+  <section *ngIf="!isLoading && payments">
+    <ion-list>
+      <div *ngFor="let item of payments" class="flex w-full mb-5">
+        <div (click)="addPayment(item)">
+          <p class="font-bold text-gray-900">{{ item.bank_name }}</p>
+          <p class="text-sm text-gray-600">{{ item.number }}</p>
+        </div>
+
+        <div class="ml-auto">
+          <ion-buttons slot="end">
+            <ion-button (click)="changePayment($event, item)">
+              <ion-icon name="ellipsis-vertical-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+          </div>
+      </div>
+    </ion-list>
+  </section>
+
+  <div class="mt-6">
+    <ion-button color="orange" mode="ios" expand="block" type="button" (click)="addPayment()">Tambah No. Rek</ion-button>
+  </div>
+</ion-content>

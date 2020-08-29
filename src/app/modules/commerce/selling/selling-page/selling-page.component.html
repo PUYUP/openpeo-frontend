@@ -1,0 +1,54 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="orange">
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>{{ !isLoading && product ? product.name : 'Memuat...' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <section *ngIf="!isLoading && orderItems">
+    <ion-list [ngStyle]="{'padding.px': '4'}">
+      <div *ngFor="let item of orderItems" class="block order-item mb-6">
+        <p class="font-bold text-lg mb-2">{{ item.buyer_name }}</p>
+        <div class="flex w-full">
+          <div class="w-1/3">
+            <p class="text-sm text-gray-600 leading-none">Jumlah</p>
+            <p>{{ item.quantity }} Porsi</p>
+          </div>
+
+          <div class="w-1/3">
+            <p class="text-sm text-gray-600 leading-none">No. Handphone</p>
+            <p>{{ item.buyer_msisdn }}</p>
+          </div>
+
+          <div class="ml-auto w-1/3 text-right">
+            <button type="button" class="bg-gray-300 text-blue-600 pl-5 pr-5 pt-2 pb-2 text-sm">CHAT</button>
+          </div>
+        </div>
+
+        <div class="block mt-2">
+          <button type="button" (click)="updateOrder(item)" class="bg-green-400 text-white text-xs pr-5 pl-5 pt-1 pb-1 rounded-full shadow-md">
+            {{ item.status == 'pending' ? 'Menunggu' : '' }}
+            {{ item.status == 'confirmed' ? 'Konfirmasi' : '' }}
+            {{ item.status == 'deliver' ? 'Dikirim' : '' }}
+            {{ item.status == 'done' ? 'Selesai' : '' }}
+          </button>
+        </div>
+
+        <div *ngIf="item.note" class="block mt-3">
+          <p class="text-sm text-red-500 font-bold">Catatan</p>
+          <p class="text-sm text-gray-700">{{ item.note }}</p>
+        </div>
+      </div> <!-- item -->
+    </ion-list>
+
+    <div class="mt-4">
+      <ion-button (click)="updateAll()" color="orange" mode="ios" expand="block" type="button">Update Semua Order</ion-button>
+    </div>
+  </section>
+</ion-content>

@@ -1,0 +1,42 @@
+<div class="ion-padding">
+  <div class="flex w-full items-center mb-5">
+    <div class="pr-2 pl-3">
+      <img src="assets/icon/exclamation-red.svg">
+    </div>
+
+    <div class="text-lg font-bold">
+      Batalkan Pesanan
+    </div>
+
+    <div class="ml-auto">
+      <button type="button" (click)="dismiss()" class="bg-white-900 w-10 h-10">
+        <ion-icon name="close-outline" class="text-gray-600 text-2xl mt-2"></ion-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="p-3">
+    <div *ngFor="let item of cartItemsExted" class="overflow-hidden bg-white mb-5 leading-normal order-item" (click)="removeItem(item)">
+      <div class="flex w-full items-center">
+        <img class="w-12 h-12 rounded mr-3" src="{{ item.picture ? item.picture : 'assets/no-image.png' }}" alt="{{ item.product_name }}">
+
+        <div class="block w-full flex flex-col">
+          <div class="flex w-full items-center">
+            <div class="w-full pr-2">
+              <p class="text-gray-900 leading-5 font-bold" [ngStyle]="{'font-size.px': '15'}">{{ item.product_name }}</p>
+            </div>
+            
+            <div class="ml-auto">
+              <img *ngIf="!item.is_removed" src="assets/icon/check-gray.svg">
+              <img *ngIf="item.is_removed" src="assets/icon/check-red.svg">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 pt-4 pb-4">
+      <ion-button (click)="removeSelectedItem()" color="orange" mode="ios" expand="block" type="button">Batalkan Pesanan</ion-button>
+    </div>
+  </div>
+</div>

@@ -1,1 +1,17 @@
+.bottom-tabs {
+    height: 60px;
+}
 
+.bottom-tabs ion-tab-button {
+    background-color: #f4f4f4;
+    height: 60px;
+    padding-top: 1px;
+}
+
+.bottom-tabs .tab-selected {
+    color: #f64c4c;
+}
+
+ion-tab-button {
+    max-width: none;
+}

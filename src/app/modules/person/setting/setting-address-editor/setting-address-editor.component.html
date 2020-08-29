@@ -1,0 +1,15 @@
+<form class="w-full max-w-sm" [formGroup]="formFactory" (ngSubmit)="onSubmit()" ngNativeValidate>
+  <div class="mb-6">
+    <label class="block text-gray-900 mb-2" for="address">
+      Alamat Pengiriman
+    </label>
+
+    <textarea formControlName="address" rows="5" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="description" placeholder="ketuk untuk menambahkan deskripsi"></textarea>
+  </div>
+
+  <div class="mt-2 pt-4">
+    <ion-button color="success" mode="ios" expand="block" type="submit" [disabled]="!formFactory.valid || isSubmitLoading">
+      Simpan
+    </ion-button>
+  </div>
+</form>

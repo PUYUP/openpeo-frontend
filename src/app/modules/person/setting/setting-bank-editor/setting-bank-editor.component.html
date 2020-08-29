@@ -1,0 +1,58 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="orange">
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>
+      {{ item ? 'Rubah No. Rekening' : 'Tambah No. Rekening' }}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div *ngIf="!isLoading && banks" [ngStyle]="{'padding-top.px': '5'}">
+    <form class="w-full max-w-sm" [formGroup]="formFactory" (ngSubmit)="onSubmit()" ngNativeValidate>
+      <div class="mb-6">
+        <label class="block text-gray-900 mb-2" for="name">
+          Nama Bank
+        </label>
+
+        <div class="relative">
+          <select formControlName="bank" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" required>
+            <option value="">Pilih Bank</option>
+            <option *ngFor="let bank of banks" value="{{ bank.id }}">{{ bank.name }}</option>
+          </select>
+
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-gray-900 mb-2" for="number">
+          Masukkan No. Rekening
+        </label>
+
+        <input formControlName="number" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="number" type="text" placeholder="xxxx-xxxx-213" required>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-gray-900 mb-2" for="name">
+          Nama Pemilik Rekening
+        </label>
+
+        <input formControlName="name" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="name" type="text" placeholder="Masukkan name pemilik No. Rek" required>
+      </div>
+
+      <div class="mt-2 pt-4">
+        <ion-button color="success" mode="ios" expand="block" type="submit" [disabled]="!formFactory.valid || isSubmitLoading">
+          Simpan
+        </ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>

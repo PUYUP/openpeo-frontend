@@ -1,0 +1,15 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="orange">
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>Alamat</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <app-setting-address-editor></app-setting-address-editor>
+</ion-content>

@@ -1,0 +1,27 @@
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-grid>
+    <ion-row class="ion-justify-content-center ion-align-items-center">
+      <ion-col>
+        <div class="ion-text-center logo">
+          <img src="assets/icon/logo.svg" class="inline-block">
+        </div>
+
+        <div class="content">
+          <h1><strong>Halo,</strong></h1>
+          <p [ngStyle]="{'color': 'rgba(0, 0, 0, 0.49)', 'line-height': '1.4'}">
+            Selamat datang di OpenPeO. Melalui OpenPeO Anda
+            dapat menambah penghasilan dan membeli aneka
+            makanan dengan harga terjangkau.Tidak perlu
+            meng-install aplikasi. Tidak ada komisi dan biaya
+            apapun. 
+          </p>
+        </div>
+
+        <div class="action">
+          <ion-button color="danger" mode="ios" expand="block" routerLink="/login">Login</ion-button>
+          <ion-button color="light" mode="ios" expand="block" routerLink="/register" class="ion-margin-top">Register</ion-button>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

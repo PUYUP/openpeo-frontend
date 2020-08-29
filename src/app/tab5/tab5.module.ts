@@ -4,18 +4,18 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Tab5Page } from './tab5.page';
-import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 
 import { Tab5PageRoutingModule } from './tab5-routing.module'
+import { SettingModule } from '../modules/person/setting/setting.module';
 
 @NgModule({
   imports: [
     IonicModule,
     CommonModule,
     FormsModule,
-    ExploreContainerComponentModule,
     RouterModule.forChild([{ path: '', component: Tab5Page }]),
     Tab5PageRoutingModule,
+    SettingModule
   ],
   declarations: [Tab5Page]
 })

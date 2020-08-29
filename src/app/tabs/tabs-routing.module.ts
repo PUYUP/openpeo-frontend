@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import { AuthLoggedInGuard } from '../services/auth/auth.guard';
 
 const routes: Routes = [
   {
     path: 'tabs',
+    canActivate: [AuthLoggedInGuard],
     component: TabsPage,
     children: [
       {
@@ -29,14 +31,14 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/tabs/tab1',
+        redirectTo: '/splash',
         pathMatch: 'full'
       }
     ]
   },
   {
     path: '',
-    redirectTo: '/tabs/tab1',
+    redirectTo: '/splash',
     pathMatch: 'full'
   }
 ];

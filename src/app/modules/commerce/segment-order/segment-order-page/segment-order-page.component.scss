@@ -1,0 +1,18 @@
+.order-status {
+    position: relative;
+}
+
+.order-status::before {
+    content: "";
+    border-top: 1px dashed #e5e5e5;
+    position: absolute;
+    top: 8px;
+    left: 15%;
+    right: 15%;
+}
+
+.order-status img {
+    position: relative;
+    background-color: #fff;
+    z-index: 5;
+}

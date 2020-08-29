@@ -1,0 +1,178 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="orange">
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>
+      {{ productUUID ? 'Ubah Produk': 'Tambah Produk' }}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="flex justify-center w-full" [ngStyle]="{'padding-top.px': '5'}">
+    <form class="w-full max-w-sm" [formGroup]="formFactory" (ngSubmit)="onSubmit()" ngNativeValidate>
+      <input type="file" (change)="fileChangeEvent($event)" class="hidden" accept="image/*" #file />
+      
+      <div class="mb-6">
+        <div class="ratio">
+          <div class="ratio-content">
+            <div (click)="file.click()" class="flex w-full items-center justify-center content-center h-full bg-gray-200 rounded border border-gray-400 border-2 border-dashed">
+              <div *ngIf="!isLoading && (!product || product && !product.picture)" class="flex w-full items-center justify-center content-center">
+                <div class="pr-3">
+                  <ion-icon name="image-outline" class="text-4xl"></ion-icon>
+                </div>
+
+                <div class="block">Ketuk Untuk Tambah Gambar</div>
+              </div>
+
+              <img *ngIf="!isLoading && product && product.picture" src="{{ product.picture }}" class="image-full" alt="product.name">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-gray-900 mb-2" for="name">
+          Nama Produk
+        </label>
+
+        <input formControlName="name" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="name" type="text" placeholder="masukkan nama produk" required>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-gray-900 mb-2">
+          Batas Akhir Pemesanan
+        </label>
+        
+        <ion-grid class="ion-no-padding">
+          <ion-row>
+            <ion-col>
+              <div class="relative pr-1">
+                <select formControlName="deadline_day" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="deadline-date">
+                  <option value="">Tanggal</option>
+                  <option *ngFor="let in of dateChoices(31); let i = index" value="{{ i+1 }}">{{ i+1 }}</option>
+                </select>
+
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
+            </ion-col>
+
+            <ion-col>
+              <div class="relative pr-1">
+                <select formControlName="deadline_month" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="deadline-date">
+                  <option value="">Bulan</option>
+                  <option *ngFor="let m of monthList" value="{{ m.number }}">{{ m.name }}</option>
+                </select>
+
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
+            </ion-col>
+
+            <ion-col>
+              <div class="relative pr-1">
+                <select formControlName="deadline_year" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="deadline-date">
+                  <option value="">Tahun</option>
+                  <option *ngFor="let i of yearList" value="{{ i }}">{{ i }}</option>
+                </select>
+
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-gray-900 mb-2">
+          Tanggal Pengiriman
+        </label>
+        
+        <ion-grid class="ion-no-padding">
+          <ion-row>
+            <ion-col>
+              <div class="relative pr-1">
+                <select formControlName="delivery_day" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="deadline-date">
+                  <option value="">Tanggal</option>
+                  <option *ngFor="let in of dateChoices(31); let i = index" value="{{ i+1 }}">{{ i+1 }}</option>
+                </select>
+
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
+            </ion-col>
+
+            <ion-col>
+              <div class="relative pr-1">
+                <select formControlName="delivery_month" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="deadline-date">
+                  <option value="">Bulan</option>
+                  <option *ngFor="let m of monthList" value="{{ m.number }}">{{ m.name }}</option>
+                </select>
+
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
+            </ion-col>
+
+            <ion-col>
+              <div class="relative pr-1">
+                <select formControlName="delivery_year" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="deadline-date">
+                  <option value="">Tahun</option>
+                  <option *ngFor="let i of yearList" value="{{ i }}">{{ i }}</option>
+                </select>
+
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-gray-900 mb-2" for="description">
+          Deskripsi Produk
+        </label>
+
+        <textarea formControlName="description" rows="5" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="description" placeholder="ketuk untuk menambahkan deskripsi"></textarea>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-gray-900 mb-2" for="price">
+          Harga Produk
+        </label>
+
+        <input formControlName="price" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="price" type="number" placeholder="harga produk" required>
+      </div>
+
+      <div class="flex w-100 items-center">
+        <div>Tersedia</div>
+        <div class="ml-auto">
+          <ion-toggle formControlName="is_active" color="success"></ion-toggle>
+        </div>
+      </div>
+
+      <div class="mt-2 pt-4">
+        <ion-button color="orange" mode="ios" expand="block" type="submit" [disabled]="!formFactory.valid || isLoading">
+          {{ productUUID ? 'Simpan' : 'Tambah Produk' }}
+        </ion-button>
+
+        <ion-button *ngIf="productUUID" (click)="delete()" color="light" mode="ios" expand="block" type="button" class="mt-5">
+          <span class="text-red-500">Hapus Produk</span>
+        </ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>

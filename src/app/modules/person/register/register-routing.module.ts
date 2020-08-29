@@ -1,0 +1,19 @@
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { RegisterPageComponent } from './register-page/register-page.component';
+import { AuthGuestGuard } from '../../../services/auth/auth.guard';
+
+
+const routes: Routes = [
+  {
+    path: '',
+    canActivate: [AuthGuestGuard],
+    component: RegisterPageComponent
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class RegisterRoutingModule { }

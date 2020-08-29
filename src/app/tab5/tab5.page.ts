@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { AuthService } from '../services/auth/auth.service';
+import { finalize } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tab5',
@@ -7,6 +10,31 @@ import { Component } from '@angular/core';
 })
 export class Tab5Page {
 
-  constructor() {}
+  constructor(
+    private _authService: AuthService,
+    private _router: Router
+  ) {}
+
+  notificationSetupChange(event: any): void {
+    console.log(event);
+  }
+
+  logout(): void {
+    event.preventDefault();
+
+    this._authService.logout()
+      .pipe(
+        finalize(() => {
+        })
+      )
+      .subscribe(
+        (response: any) => {
+          this._router.navigate(['/splash'], {replaceUrl: true});
+        },
+        (failure: any) => {
+          
+        }
+      )
+  }
 
 }

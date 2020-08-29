@@ -1,0 +1,47 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="danger">
+    <ion-buttons slot="start">
+      <ion-button routerLink="/splash">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>
+      Register
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="flex justify-center w-full" [ngStyle]="{'padding-top.px': '20'}">
+    <form class="w-full max-w-sm" [formGroup]="formFactory" (ngSubmit)="onSubmit()" ngNativeValidate>
+      <div class="mb-6">
+        <label class="block text-gray-900 mb-2" for="msisdn">
+          No. Handphone
+        </label>
+
+        <input formControlName="msisdn" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="msisdn" type="tel" placeholder="masukkan no. handphone anda 081xxxxxxx" required>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-gray-900 mb-2" for="password">
+          Password
+        </label>
+
+        <input formControlName="password" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="password" type="password" placeholder="masukkan password anda">
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-gray-900 mb-2" for="email">
+          Email
+        </label>
+
+        <input formControlName="email" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-red-500" id="email" type="email" placeholder="masukkan email anda">
+      </div>
+
+      <div class="mt-6 pt-4">
+        <ion-button color="danger" mode="ios" expand="block" type="submit" [disabled]="!formFactory.valid || isLoading">Register</ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>

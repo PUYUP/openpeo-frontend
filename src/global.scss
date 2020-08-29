@@ -24,3 +24,80 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+/* TailwindCSS */
+@import "tailwindcss/dist/base.min.css";
+@import "tailwindcss/dist/components.min.css";
+@import "tailwindcss/dist/utilities.min.css";
+
+.ion-color-orange {
+    --ion-color-base: var(--ion-color-orange);
+    --ion-color-base-rgb: var(--ion-color-orange-rgb);
+    --ion-color-contrast: var(--ion-color-orange-contrast);
+    --ion-color-contrast-rgb: var(--ion-color-orange-contrast-rgb);
+    --ion-color-shade: var(--ion-color-orange-shade);
+    --ion-color-tint: var(--ion-color-orange-tint);
+}
+
+.mini-segment {
+    width: 150px;
+    text-transform: uppercase;
+}
+
+.mini-segment ion-segment-button {
+    height: 30px;
+}
+
+.modal-extend {
+    padding-top: 50%;
+    --border-radius: 25px 25px 0 0;
+}
+
+.model-bottom {
+    padding-top: 135%;
+}
+
+.my-custom-class .popover-content {
+    left: 75px !important;
+}
+
+.image-full {
+	position: absolute;
+	z-index: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	-o-object-fit: cover;
+}
+
+.ratio {
+    width: 100%;
+    padding-top:  56.25%;
+    position: relative;
+}
+  
+.ratio-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.ratio-full {
+    width: 100%;
+    padding-top:  100%;
+    position: relative;
+}
+  
+.ratio-full-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}

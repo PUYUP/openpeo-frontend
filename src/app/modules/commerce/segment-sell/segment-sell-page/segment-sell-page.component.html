@@ -1,0 +1,48 @@
+<div class="ion-padding">
+  <div *ngIf="isLoading" class="flex content-center w-full mb-4">
+    <ion-spinner class="ml-auto mr-auto"></ion-spinner>
+  </div>
+
+  <ion-list *ngIf="!isLoading && products" [ngStyle]="{'padding.px': '4'}">
+    
+      <div *ngFor="let item of products" class="rounded overflow-hidden shadow shadow-sm bg-white p-3 mb-5 leading-normal" routerLink="/product/{{ item.uuid }}/editor">
+        <div class="flex items-center">
+          <div class="mr-3 w-32 h-auto">
+            <div class="ratio-full">
+              <div class="ratio-full-content">
+                <img class="image-full rounded" src="{{ item.picture ? item.picture : 'assets/no-image.png' }}" alt="{{ item.name }}">
+              </div>
+            </div>
+          </div>
+
+          <div class="w-full">
+            <p class="text-gray-900 leading-5 mb-0" [ngStyle]="{'font-size.px': '15'}">{{ item.name }}</p>
+            <p class="text-gray-900 text-lg">Rp. {{ item.price | number }}</p>
+
+            <div class="flex flex-grow items-end mt-2">
+              <div class="block">
+                <div class="flex items-end">
+                  <div class="pr-3">
+                    <img src="assets/icon/truck.svg" alt="Delivery date">
+                  </div>
+
+                  <div>
+                    <p class="text-gray-600 leading-none mb-1 text-xs">Diantar</p>
+                    <p class="text-gray-800 leading-none text-sm">{{ item.delivery_date | date: 'dd.MM.yyyy' }}</p>
+                  </div>
+                </div> <!-- send date -->
+              </div>
+
+              <div class="ml-auto">
+                <span *ngIf="item.is_active" class="w-16 inline-block border border-green-300 text-center text-xs text-green-500 p-1 pl-2 pr-2 rounded-full" [ngStyle]="{'font-size.px': '11'}">BUKA</span>
+                <span *ngIf="!item.is_active" class="w-16 inline-block border border-red-300 text-center text-xs text-red-500 p-1 pl-2 pr-2 rounded-full" [ngStyle]="{'font-size.px': '11'}">TUTUP</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </ion-list>
+
+  <ion-button color="orange" mode="ios" expand="block" routerLink='/product/editor' type="button">Tambah Produk</ion-button>
+</div>

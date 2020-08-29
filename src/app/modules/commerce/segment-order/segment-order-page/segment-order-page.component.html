@@ -1,0 +1,65 @@
+<div class="ion-padding">
+  <div *ngIf="isLoading" class="flex content-center w-full mb-4">
+    <ion-spinner class="ml-auto mr-auto"></ion-spinner>
+  </div>
+
+  <p *ngIf="!isLoading && orders.length == 0">
+    Belum memesan apapun
+  </p>
+
+  <ion-list *ngIf="!isLoading && orders" [ngStyle]="{'padding.px': '4'}">
+    
+      <div *ngFor="let item of orders" class="rounded overflow-hidden shadow shadow-sm bg-white p-3 mb-5 leading-normal" (click)="toDetail(item)">
+        <div class="w-full">
+          <div class="flex w-full">
+            <div class="block w-3/5">
+              <p class="text-gray-800 font-bold">{{ item.seller_name }}</p>
+
+              <div class="flex items-center w-full pt-1">
+                <div class="block pr-2">
+                  <div class="w-6 h-6 rounded text-center bg-gray-200 flex items-center justify-center content-center text-red-500 text-xs font-bold">
+                    {{ item.total_item }}X
+                  </div>
+                </div>
+
+                <div class="w-5/6">
+                  <p class="text-gray-500 leading-0 text-xs overflow-hidden truncate">{{ item.items_summary.join(', ') }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="ml-auto">
+              <div class="flex items-end">
+                <div class="pr-3">
+                  <img src="assets/icon/truck.svg" alt="Delivery date">
+                </div>
+
+                <div>
+                  <p class="text-gray-600 leading-none mb-1 text-xs">Diantar</p>
+                  <p class="text-gray-800 leading-none text-sm">{{ item.delivery_date | date: 'dd.MM.yyyy' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex w-full order-status justify-center text-xs text-gray-500 mt-4">
+            <div class="block w-1/3 text-center">
+              <img src="{{ item.status == 'done' || item.status == 'confirmed' || item.status == 'deliver' || item.status == 'payed' ? 'assets/icon/status-green.svg' : 'assets/icon/status-red.svg' }}" class="ml-auto mr-auto">
+              <p class="mt-1">Dikonfirmasi</p>
+            </div>
+
+            <div class="block w-1/3 text-center">
+              <img src="{{ item.status == 'done' || item.status == 'deliver' || item.status == 'payed' ? 'assets/icon/status-green.svg' : 'assets/icon/status-red.svg' }}" class="ml-auto mr-auto">
+              <p class="mt-1">Diantar</p>
+            </div>
+
+            <div class="block w-1/3 text-center">
+              <img src="{{ item.status == 'done' || item.status == 'payed' ? 'assets/icon/status-green.svg' : 'assets/icon/status-red.svg' }}" class="ml-auto mr-auto">
+              <p class="mt-1">Konfirmasi Bayar</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </ion-list>
+</div>

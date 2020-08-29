@@ -5,7 +5,16 @@ import { Tab1Page } from './tab1.page';
 const routes: Routes = [
   {
     path: '',
-    component: Tab1Page,
+    children: [
+      {
+        path: '',
+        component: Tab1Page,
+      },
+      {
+        path: ':segment',
+        component: Tab1Page,
+      }
+    ]
   }
 ];
 

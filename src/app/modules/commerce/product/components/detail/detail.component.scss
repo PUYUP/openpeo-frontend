@@ -1,0 +1,20 @@
+.chat-button {
+    --box-shadow: none;
+}
+
+.header-top {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: auto;
+}
+
+.header-top ion-toolbar {
+    --ion-color-base: transparent;
+    --ion-color-base-rgb: transparent;
+    --ion-color-contrast: #fff;
+    --ion-color-contrast-rgb: transparent;
+    --ion-color-shade: transparent;
+    --ion-color-tint: transparent;
+}
