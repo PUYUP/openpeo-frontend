@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   appName: 'Open Peo',
-  host: 'http://localhost:8000'
+  host: 'http://127.0.0.1:8000',
+  hostName: '127.0.0.1:8000',
 };
 
 /*

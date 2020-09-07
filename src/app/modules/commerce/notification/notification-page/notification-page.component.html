@@ -1,0 +1,37 @@
+<ion-header [translucent]="true" class="header-top">
+  <ion-toolbar color="orange">
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>Notifikasi</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list *ngIf="!isLoading && notifications">
+    <ion-item *ngFor="let item of notifications" lines="full" detail mode="ios" routerLink="/chat/{{ item.chat_uuid }}">
+      <ion-label *ngIf="item.object && item.object.is_creator == true" text-wrap>
+        <strong class="text-sm">
+          {{ item.verb == 'new' ? 'Pesanan Baru' : '' }}
+        </strong>
+
+        <p class="text-sm text-gray-500">Anda mendapatkan pesanan baru untuk '{{ item.object.name }}'</p>
+      </ion-label>
+
+      <ion-label *ngIf="item.object && item.object.is_creator == false" text-wrap>
+        <strong class="text-sm">
+          {{ item.verb == 'accepted' ? 'Pesanan Diterima' : '' }}
+          {{ item.verb == 'deliver' ? 'Pesanan Dikirim' : '' }}
+          {{ item.verb == 'done' ? 'Pesanan Selesai' : '' }}
+        </strong>
+
+        <p *ngIf="item.verb == 'accepted'" class="text-sm text-gray-500">Pesanan '{{ item.object.name }}' diterima</p>
+        <p *ngIf="item.verb == 'deliver'" class="text-sm text-gray-500">Pesanan'{{ item.object.name }}' sedang dikirim</p>
+        <p *ngIf="item.verb == 'done'" class="text-sm text-gray-500">Pesanan '{{ item.object.name }}' telah selesai</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -14,6 +14,7 @@ export class OrderService {
   url: string = this.host + '/api/commerce/orders/';
   urlCart: string = this.host + '/api/commerce/carts/';
   urlSell: string = this.host + '/api/commerce/sells/';
+  urlOrder: string = this.host + '/api/commerce/orders/';
 
   constructor(
     private _httpClient: HttpClient
@@ -71,6 +72,26 @@ export class OrderService {
 
   updateItem(cartUUID: string, itemUUID: string, context: any): Observable<any> {
     return this._httpClient.patch(this.urlCart + cartUUID + '/items/' + itemUUID + '/', context, {withCredentials: true})
+      .pipe(
+        retry(3),
+        map((response: any) => {
+          return response;
+        })
+      )
+  }
+
+  removeOrderItem(orderUUID: string, itemUUID: string): Observable<any> {
+    return this._httpClient.delete(this.urlOrder + orderUUID + '/items/' + itemUUID + '/', {withCredentials: true})
+      .pipe(
+        retry(3),
+        map((response: any) => {
+          return response;
+        })
+      )
+  }
+
+  updateOrderItem(orderUUID: string, itemUUID: string, context: any): Observable<any> {
+    return this._httpClient.patch(this.urlOrder + orderUUID + '/items/' + itemUUID + '/', context, {withCredentials: true})
       .pipe(
         retry(3),
         map((response: any) => {

@@ -31,6 +31,18 @@ const routes: Routes = [
     loadChildren: () => import('./modules/person/setting/setting.module').then(m => m.SettingModule)
   },
   {
+    path: 'chat',
+    loadChildren: () => import('./modules/commerce/chat/chat.module').then(m => m.ChatModule)
+  },
+  {
+    path: 'notification',
+    loadChildren: () => import('./modules/commerce/notification/notification.module').then(m => m.NotificationModule)
+  },
+  {
+    path: 'payment',
+    loadChildren: () => import('./modules/commerce/payment/payment.module').then(m => m.PaymentModule)
+  },
+  {
     path: '',
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
   }

@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { AlertController, NavController } from '@ionic/angular';
 import { ProductService } from '../../../../../services/commerce/product.service';
+import { EventService } from '../../../../../services/event.service';
 import { finalize } from 'rxjs/operators';
 
 @Component({
@@ -45,8 +46,60 @@ export class EditorComponent implements OnInit {
     private _router: Router,
     private _productService: ProductService,
     private _activatedRoute: ActivatedRoute,
+    private _eventService: EventService,
     public alertController: AlertController
   ) { }
+
+  async presentWarningAlert(message: string) {
+    const alert = await this.alertController.create({
+      message: message,
+      buttons: [
+        {
+          text: 'Tutup',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            console.log('Confirm Cancel: blah');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  failureCapture(failure: any): void{
+    if (failure) {
+      let error = failure.error;
+
+      // Object error
+      if (typeof error === 'object') {
+        let msgList = [];
+
+        for (let k in error) {
+          let e = error[k];
+
+          // Check is array
+          if (Array.isArray(e)) {
+            msgList.push(e.join(' '));
+          } else {
+            msgList.push(e);
+          }
+        }
+
+        // Print the message
+        this.message = msgList.join(' ');
+
+      } else {
+        // Default error
+        if (error && error.detail) {
+          this.message = error.detail;
+        }
+      }
+    }
+
+    this.presentWarningAlert(this.message);
+  }
 
   ngOnInit() {
     // Editor edit
@@ -124,9 +177,12 @@ export class EditorComponent implements OnInit {
         (response: any) => {
           this.product = response;
           this._router.navigate(['/product', this.product.uuid], {replaceUrl: true});
+
+          // trigger sell page
+          this._eventService.publish('commerce:productCreated', {'product': this.product});
         },
         (failure: any) => {
-
+          this.failureCapture(failure);
         }
       )
   }
@@ -142,9 +198,12 @@ export class EditorComponent implements OnInit {
         (response: any) => {
           this.product = response;
           this._router.navigate(['/product', this.product.uuid], {replaceUrl: true});
+
+          // trigger sell page
+          this._eventService.publish('commerce:productUpdated', {'product': this.product});
         },
         (failure: any) => {
-
+          this.failureCapture(failure);
         }
       )
   }
@@ -159,6 +218,9 @@ export class EditorComponent implements OnInit {
       .subscribe(
         (response: any) => {
           this._router.navigate(['/tabs/tab1/sell'], {replaceUrl: true});
+
+          // trigger sell page
+          this._eventService.publish('commerce:productDeleted', {'productUUID': this.productUUID});
         },
         (failure: any) => {
 
@@ -182,16 +244,16 @@ export class EditorComponent implements OnInit {
       .subscribe(
         (response: any) => {
           this.product = response;
-  
+
           const order_deadline = new Date(this.product.order_deadline);
           const delivery_date = new Date(this.product.delivery_date);
 
           this.formFactory.patchValue({
             name: this.product.name,
-            deadline_day: order_deadline.getDay(),
+            deadline_day: order_deadline.getDate(),
             deadline_month: order_deadline.getMonth(),
             deadline_year: order_deadline.getFullYear(),
-            delivery_day: delivery_date.getDay(),
+            delivery_day: delivery_date.getDate(),
             delivery_month: delivery_date.getMonth(),
             delivery_year: delivery_date.getFullYear(),
             description: this.product.description,

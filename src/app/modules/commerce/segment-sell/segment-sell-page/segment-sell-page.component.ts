@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ProductService } from '../../../../services/commerce/product.service';
 import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../../../services/auth/auth.service';
+import { EventService } from '../../../../services/event.service';
 
 @Component({
   selector: 'app-segment-sell-page',
@@ -17,13 +18,30 @@ export class SegmentSellPageComponent implements OnInit {
 
   constructor(
     private _productService: ProductService,
-    private _authService: AuthService
+    private _authService: AuthService,
+    private _eventService: EventService
   ) { }
 
   ngOnInit() {
     this.credential = this._authService.getCredential();
     this.userUUID = (this.credential ? this.credential.uuid : '');
+
     this.loadProducts();
+    
+    // created
+    this._eventService.subscribe('commerce:productCreated', (product: any) => {
+      this.loadProducts();
+    });
+
+    // updated
+    this._eventService.subscribe('commerce:productUpdated', (product: any) => {
+      this.loadProducts();
+    });
+
+    // deleted
+    this._eventService.subscribe('commerce:productDeleted', (product: any) => {
+      this.loadProducts();
+    });
   }
 
   ionViewDidEnter() {
@@ -46,6 +64,12 @@ export class SegmentSellPageComponent implements OnInit {
 
         }
       )
+  }
+
+  ngOnDestroy() {
+    this._eventService.destroy('commerce:productCreated');
+    this._eventService.destroy('commerce:productUpdated');
+    this._eventService.destroy('commerce:productDeleted');
   }
 
 }

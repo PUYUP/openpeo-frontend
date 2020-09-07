@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { CartService } from '../services/commerce/cart.service';
 import { finalize } from 'rxjs/operators';
-import { OrderService } from '../services/commerce/order.service';
 import { Router } from '@angular/router';
+
+import { OrderService } from '../services/commerce/order.service';
+import { CartService } from '../services/commerce/cart.service';
+import { EventService } from '../services/event.service';
 
 @Component({
   selector: 'app-tab3',
@@ -20,6 +22,7 @@ export class Tab3Page implements OnInit {
   constructor(
     private _cartService: CartService,
     private _orderService: OrderService,
+    private _eventService: EventService,
     private _router: Router,
   ) { }
 
@@ -78,6 +81,7 @@ export class Tab3Page implements OnInit {
       .subscribe(
         (response: any) => {
           this._router.navigate(['tabs/tab2'], {replaceUrl: true});
+          this._eventService.publish('commerce:orderCreated', response);
         },
         (failure: any) => {
 

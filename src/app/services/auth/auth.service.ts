@@ -81,6 +81,8 @@ export class AuthService {
           // Customize credentials invalidation here
           this.setCredential();
           this.setToken(false);
+
+          this._cookieService.deleteAll();
           
           return {};
         })
@@ -206,6 +208,66 @@ export class AuthService {
     const url = this.host + '/api/person/users/password-recovery/';
 
     return this.httpClient.post<any>(url, context, {withCredentials: true})
+      .pipe(
+        retry(3),
+        map((response: any) => {
+          return response;
+        })
+      )
+  }
+
+  /***
+   * Get user
+   */
+  getUser(): Observable<any> {
+    const url = this.host + '/api/person/users/' + this.credential.uuid + '/';
+
+    return this.httpClient.get<any>(url, {withCredentials: true})
+      .pipe(
+        retry(3),
+        map((response: any) => {
+          return response;
+        })
+      )
+  }
+
+  /***
+   * Update user
+   */
+  updateUser(context: any): Observable<any> {
+    const url = this.host + '/api/person/users/' + this.credential.uuid + '/';
+
+    return this.httpClient.patch<any>(url, context, {withCredentials: true})
+      .pipe(
+        retry(3),
+        map((response: any) => {
+          return response;
+        })
+      )
+  }
+
+  /***
+   * Update account
+   */
+  updateAccount(context: any): Observable<any> {
+    const url = this.host + '/api/person/users/' + this.credential.uuid + '/account/';
+
+    return this.httpClient.patch<any>(url, context, {withCredentials: true})
+      .pipe(
+        retry(3),
+        map((response: any) => {
+          return response;
+        })
+      )
+  }
+
+  /***
+   * Update profile
+   */
+  updateProfile(context: any): Observable<any> {
+    const url = this.host + '/api/person/users/' + this.credential.uuid + '/profile/';
+
+    return this.httpClient.patch<any>(url, context, {withCredentials: true})
       .pipe(
         retry(3),
         map((response: any) => {

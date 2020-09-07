@@ -18,10 +18,12 @@
   <div *ngIf="!isLoading && product" class="block">
     <figure>
       <div class="ratio">
-        <div class="ratio-content">
+        <div class="ratio-content product-image">
           <div class="flex w-full items-center justify-center content-center h-full bg-gray-200 rounded border border-gray-400 border-2 border-dashed">
             <img src="{{ product.picture ? product.picture : 'assets/no-image.png' }}" class="image-full" alt="product.name">
           </div>
+
+          <p class="text-text-xl text-white">{{ product.name }}</p>
         </div>
       </div>
     </figure>
@@ -33,7 +35,7 @@
         </div>
 
         <div class="ml-auto">
-          <ion-button color="light" class="chat-button">
+          <ion-button color="light" class="chat-button" (click)="startChat()" [disabled]="isChatLoading">
             <span class="text-purple-600 inline-block text-sm">Chat</span>
           </ion-button>
         </div>

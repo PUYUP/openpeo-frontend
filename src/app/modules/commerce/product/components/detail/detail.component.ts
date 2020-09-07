@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import {  ActivatedRoute } from '@angular/router';
+import {  ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../../../services/commerce/product.service';
 import { finalize } from 'rxjs/operators';
 import { Location } from '@angular/common';
 import { CartService } from '../../../../../services/commerce/cart.service';
 import { AlertController, NavController } from '@ionic/angular';
+import { ChatService } from '../../../../../services/commerce/chat.service';
 
 @Component({
   selector: 'app-detail',
@@ -17,15 +18,19 @@ export class DetailComponent implements OnInit {
   product: any;
   isLoading: boolean = false;
   isCartLoading: boolean = false;
+  isChatLoading: boolean = false;
   itemQty: number = 0;
+  message: string = '';
 
   constructor(
     public alertController: AlertController,
     public navCtrl: NavController,
+    private _router: Router,
     private _location: Location,
     private _activatedRoute: ActivatedRoute,
     private _productService: ProductService,
-    private _cartService: CartService
+    private _cartService: CartService,
+    private _chatService: ChatService
   ) { }
 
   async presentAlert(message: string) {
@@ -36,7 +41,7 @@ export class DetailComponent implements OnInit {
           text: 'Chat Penjual',
           cssClass: 'text-red-500',
           handler: () => {
-            console.log('Confirm Okay');
+            this.startChat();
           }
         },
         {
@@ -51,6 +56,57 @@ export class DetailComponent implements OnInit {
     });
 
     await alert.present();
+  }
+
+  async presentWarningAlert(message: string) {
+    const alert = await this.alertController.create({
+      message: message,
+      buttons: [
+        {
+          text: 'Tutup',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            console.log('Confirm Cancel: blah');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  failureCapture(failure: any): void{
+    if (failure) {
+      let error = failure.error;
+
+      // Object error
+      if (typeof error === 'object') {
+        let msgList = [];
+
+        for (let k in error) {
+          let e = error[k];
+
+          // Check is array
+          if (Array.isArray(e)) {
+            msgList.push(e.join(' '));
+          } else {
+            msgList.push(e);
+          }
+        }
+
+        // Print the message
+        this.message = msgList.join(' ');
+
+      } else {
+        // Default error
+        if (error && error.detail) {
+          this.message = error.detail;
+        }
+      }
+    }
+
+    this.presentWarningAlert(this.message);
   }
 
   ngOnInit() {
@@ -114,7 +170,37 @@ export class DetailComponent implements OnInit {
           this.presentAlert(message);
         },
         (failure: any) => {
+          this.failureCapture(failure);
+        }
+      )
+  }
 
+  startChat(): void {
+    this.isChatLoading = true;
+
+    const data = {
+      'send_to_user': this.product.seller_id,
+      'chat_messages': [
+        {
+          'message': "Hai apakah produk ini masih ada?",
+          'content_type': this.product.content_type_id,
+          'object_id': this.product.id,
+        }
+      ]
+    };
+
+    this._chatService.create(data)
+      .pipe(
+        finalize(() => {
+          this.isChatLoading = false;
+        })
+      )
+      .subscribe(
+        (response: any) => {
+          this._router.navigate(['/chat', response.uuid]);
+        },
+        (failure: any) => {
+          this.failureCapture(failure);
         }
       )
   }

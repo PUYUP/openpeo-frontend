@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { OrderService } from '../../../../services/commerce/order.service';
 import { finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { EventService } from '../../../../services/event.service';
 
 @Component({
   selector: 'app-segment-order-page',
@@ -16,11 +17,17 @@ export class SegmentOrderPageComponent implements OnInit {
 
   constructor(
     private _orderService: OrderService,
+    private _eventService: EventService,
     private _router: Router
   ) { }
 
   ngOnInit() {
     this.loadOrder();
+
+    // trigger from create order page (tab3)
+    this._eventService.subscribe('commerce:orderCreated', (data: any) => {
+      this.loadOrder();
+    });
   }
 
   loadOrder(): void {
@@ -45,6 +52,10 @@ export class SegmentOrderPageComponent implements OnInit {
 
   toDetail(item: any): void {
     this._router.navigate(['/order/', item.uuid]);
+  }
+
+  ngOnDestroy() {
+    this._eventService.destroy('commerce:orderCreated');
   }
 
 }

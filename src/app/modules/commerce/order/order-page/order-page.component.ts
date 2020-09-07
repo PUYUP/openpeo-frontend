@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OrderService } from '../../../../services/commerce/order.service';
 import { finalize } from 'rxjs/operators';
 import { OrderCancelComponent } from '../order-cancel/order-cancel.component';
+import { ChatService } from '../../../../services/commerce/chat.service';
 
 @Component({
   selector: 'app-order-page',
@@ -16,14 +17,15 @@ export class OrderPageComponent implements OnInit {
   orderUUID: string;
   order: any;
   summary: any;
-  cart: any = [];
-  cart_items: any = [];
+  order_items: any = [];
   isLoading: boolean = false;
+  isChatLoading: boolean = false;
 
   constructor(
     private _location: Location,
     private _activatedRoute: ActivatedRoute,
     private _orderService: OrderService,
+    private _chatService: ChatService,
     private _router: Router,
     public navCtrl: NavController,
     public modalController: ModalController
@@ -34,8 +36,8 @@ export class OrderPageComponent implements OnInit {
       component: OrderCancelComponent,
       cssClass: 'modal-extend',
       componentProps: {
-        cart: this.cart,
-        cart_items: this.cart_items,
+        order: this.order,
+        order_items: this.order_items,
       }
     });
 
@@ -75,8 +77,7 @@ export class OrderPageComponent implements OnInit {
         (response: any) => {
           this.order = response.order;
           this.summary = response.summary;
-          this.cart = this.order.cart;
-          this.cart_items = this.order.cart.cart_items;
+          this.order_items = this.order.order_items;
         },
         (failure: any) => {
 
@@ -86,6 +87,26 @@ export class OrderPageComponent implements OnInit {
 
   cancelOrder(): void {
     this.presentModal();
+  }
+
+  // Start chat
+  chatSeller(): void {
+    this.isChatLoading = true;
+
+    this._chatService.create({'send_to_user': this.order.seller})
+      .pipe(
+        finalize(() => {
+          this.isChatLoading = false;
+        })
+      )
+      .subscribe(
+        (response: any) => {
+          this._router.navigate(['/chat', response.uuid]);
+        },
+        (failure: any) => {
+
+        }
+      )
   }
 
 }

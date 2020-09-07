@@ -14,7 +14,7 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
   <div *ngIf="!isLoading && banks" [ngStyle]="{'padding-top.px': '5'}">
-    <form class="w-full max-w-sm" [formGroup]="formFactory" (ngSubmit)="onSubmit()" ngNativeValidate>
+    <form class="w-full" [formGroup]="formFactory" (ngSubmit)="onSubmit()" ngNativeValidate>
       <div class="mb-6">
         <label class="block text-gray-900 mb-2" for="name">
           Nama Bank

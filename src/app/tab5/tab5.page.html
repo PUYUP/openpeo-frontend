@@ -7,6 +7,18 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-item detail mode="ios" lines="full" routerLink="/setting/profile">
+    <ion-avatar slot="start">
+        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
+      </ion-avatar>
+
+    <ion-label>
+      <div class="font-semibold text-black text-lg">{{ credential.first_name ? credential.first_name : credential.username }}</div>
+      <div class="text-sm text-gray-700">{{ credential?.email }}</div>
+      <div class="text-xs text-white px-2 py-1 bg-green-500 rounded-lg inline">{{ credential?.msisdn }}</div>
+    </ion-label>
+  </ion-item>
+
   <ion-item mode="ios" lines="full">
     <ion-icon name="notifications-outline" slot="start"></ion-icon>
 

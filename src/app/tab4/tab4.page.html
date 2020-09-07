@@ -7,5 +7,26 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  
+  <ion-list *ngIf="!isLoading && chats">
+    <ion-item *ngFor="let item of chats" button routerLink="/chat/{{ item.uuid }}">
+      <ion-avatar slot="start">
+        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
+      </ion-avatar>
+
+      <ion-label>
+        <p class="flex w-full">
+          <strong class="text-gray-900 text-base">
+            {{ item.send_to_username }}
+          </strong>
+
+          <span slot="end" class="ml-auto">
+            <small *ngIf="item.last_message_date">{{ item.last_message_date | date: 'medium'}}</small>
+            <small *ngIf="!item.last_message_date">{{ item.create_date | date: 'medium'}}</small>
+          </span>
+        </p>
+
+        <p>{{ item.last_message ? item.last_message : item.first_message }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 </ion-content>

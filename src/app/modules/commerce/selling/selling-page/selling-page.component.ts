@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { OrderService } from '../../../../services/commerce/order.service';
 import { finalize } from 'rxjs/operators';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NavController, ModalController } from '@ionic/angular';
 import { Location } from '@angular/common';
 import { SellingUpdateComponent } from '../selling-update/selling-update.component';
+import { ChatService } from '../../../../services/commerce/chat.service';
 
 @Component({
   selector: 'app-selling-page',
@@ -16,11 +17,14 @@ export class SellingPageComponent implements OnInit {
   product: any;
   orderItems: any = [];
   isLoading: boolean = false;
+  isChatLoading: boolean = false;
   productUUID: string;
 
   constructor(
     private _orderService: OrderService,
+    private _chatService: ChatService,
     private _activatedRoute: ActivatedRoute,
+    private _router: Router,
     private _location: Location,
     public navCtrl: NavController,
     public modalController: ModalController
@@ -87,11 +91,42 @@ export class SellingPageComponent implements OnInit {
   }
 
   updateOrder(item: any): void {
+    console.log(item);
     this.presentModal(item);
   }
 
   updateAll(): void {
     this.presentModal('', 'all');
+  }
+
+  startChat(item: any): void {
+    this.isChatLoading = true;
+
+    const data = {
+      'send_to_user': item.buyer_id,
+      'chat_messages': [
+        {
+          'message': "Hai!",
+          'content_type': item.product_content_type_id,
+          'object_id': item.product,
+        }
+      ]
+    };
+
+    this._chatService.create(data)
+      .pipe(
+        finalize(() => {
+          this.isChatLoading = false;
+        })
+      )
+      .subscribe(
+        (response: any) => {
+          this._router.navigate(['/chat', response.uuid]);
+        },
+        (failure: any) => {
+          
+        }
+      )
   }
 
 }

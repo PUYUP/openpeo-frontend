@@ -28,7 +28,7 @@ export class SellingUpdateComponent implements OnInit {
     if (this.action == 'single') {
       const data = {
         'status': status,
-        'cart_uuid': this.item.cart_uuid,
+        'order_uuid': this.item.order_uuid,
         'item_uuid': this.item.uuid,
       };
 
@@ -39,7 +39,7 @@ export class SellingUpdateComponent implements OnInit {
       for (let item of this.order_items) {
         const data = {
           'status': status,
-          'cart_uuid': item.cart_uuid,
+          'order_uuid': item.order_uuid,
           'item_uuid': item.uuid,
         }
 
@@ -49,7 +49,7 @@ export class SellingUpdateComponent implements OnInit {
   }
 
   runUpdate(data: any): void {
-    this._orderService.updateItem(data.cart_uuid, data.item_uuid, data)
+    this._orderService.updateOrderItem(data.order_uuid, data.item_uuid, data)
       .pipe(
         finalize(() => {
           

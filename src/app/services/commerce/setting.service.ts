@@ -49,8 +49,11 @@ export class SettingService {
       )
   }
 
-  paymentList(): Observable<any> {
-    return this._httpClient.get(this.urlPayment, {withCredentials: true})
+  paymentList(sellerUUID: string = ''): Observable<any> {
+    let url = this.urlPayment;
+    if (sellerUUID) url = this.urlPayment + '?seller_uuid=' + sellerUUID;
+
+    return this._httpClient.get(url, {withCredentials: true})
       .pipe(
         retry(3),
         map((response: any) => {

@@ -1,0 +1,49 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="orange">
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>Pembayaran</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-grid>
+    <ion-row class="ion-justify-content-center ion-align-items-center">
+      <ion-col>
+        <div class="ion-text-center logo">
+          <img src="assets/icon/payment.svg" class="inline-block">
+        </div>
+
+        <div class="content pt-4 mt-4">
+          <p [ngStyle]="{'color': 'rgba(0, 0, 0, 0.49)', 'line-height': '1.7'}">
+            Silakan lakukan pembayaran anda secara
+            manual melalui transfer antar bank, kirim bukti
+            transfer melalui fitur chat, anda dapat
+            mengakses laman ini melalui menu transaksi
+            apapun. 
+          </p>
+        </div>
+
+        <div *ngIf="!isLoading && payments" class="mt-4 pt-4">
+          <div *ngFor="let item of payments" class="rounded border p-4 mb-3">
+            <div class="flex w-full">
+              <div class="flex-1">
+                <p class="text-lg font-semibold">{{ item.bank_name }}</p>
+                <p>{{ item.number }}</p>
+                <p>{{ item.name }}</p>
+              </div>
+
+              <div class="flex-1 pr-3">
+                <p class="text-xl font-semibold">Rp {{ summary.total | number }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
