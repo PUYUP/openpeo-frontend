@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ProductService } from '../../../../services/commerce/product.service';
 import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../../../services/auth/auth.service';
 import { EventService } from '../../../../services/event.service';
+import { IonInfiniteScroll } from '@ionic/angular';
 
 @Component({
   selector: 'app-segment-sell-page',
@@ -11,10 +12,13 @@ import { EventService } from '../../../../services/event.service';
 })
 export class SegmentSellPageComponent implements OnInit {
 
+  @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
+  
   products: any;
   credential: any;
   userUUID: string;
   isLoading: boolean = false;
+  next: string = null;
 
   constructor(
     private _productService: ProductService,
@@ -30,40 +34,48 @@ export class SegmentSellPageComponent implements OnInit {
     
     // created
     this._eventService.subscribe('commerce:productCreated', (product: any) => {
-      this.loadProducts();
+      this.products.unshift(product);
     });
 
     // updated
     this._eventService.subscribe('commerce:productUpdated', (product: any) => {
-      this.loadProducts();
+      const index = this.products.findIndex((d: any) => d.uuid === product.uuid);
+      this.products[index] = product;
     });
 
     // deleted
     this._eventService.subscribe('commerce:productDeleted', (product: any) => {
-      this.loadProducts();
+      this.products = this.products.filter((d: any) => d.uuid !== product.uuid);
     });
   }
 
-  ionViewDidEnter() {
-  }
+  loadProducts(isLoadMore: boolean = false, event: any = ''): void {
+    if (!isLoadMore) this.isLoading = true;
+    let next = this.next;
 
-  loadProducts(): void {
-    this.isLoading = true;
-
-    this._productService.list(this.userUUID)
+    this._productService.list({'userUUID': this.userUUID, 'next': next})
       .pipe(
         finalize(() => {
           this.isLoading = false;
+          if (isLoadMore) event.target.complete();
         })
       )
       .subscribe(
         (response: any) => {
-          this.products = response;
-        },
-        (failure: any) => {
+          if (isLoadMore) {
+            this.products = this.products.concat(response?.results)
+          } else {
+            this.products = response?.results;
+          }
 
+          this.next = response.navigate?.next;
+          if (event && !this.next) event.target.disabled = true;
         }
       )
+  }
+
+  loadData(event: any) {
+    this.loadProducts(true, event);
   }
 
   ngOnDestroy() {

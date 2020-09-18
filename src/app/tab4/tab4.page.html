@@ -10,13 +10,14 @@
   <ion-list *ngIf="!isLoading && chats">
     <ion-item *ngFor="let item of chats" button routerLink="/chat/{{ item.uuid }}">
       <ion-avatar slot="start">
-        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
+        <img *ngIf="!item.send_to_picture" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
+        <img *ngIf="item.send_to_picture" src="{{ item.send_to_picture }}">
       </ion-avatar>
 
       <ion-label>
         <p class="flex w-full">
           <strong class="text-gray-900 text-base">
-            {{ item.send_to_username }}
+            {{ item.send_to_name }}
           </strong>
 
           <span slot="end" class="ml-auto">
@@ -29,4 +30,11 @@
       </ion-label>
     </ion-item>
   </ion-list>
+
+  <ion-infinite-scroll *ngIf="!isLoading && chats" threshold="100px" (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>

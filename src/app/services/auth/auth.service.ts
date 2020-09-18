@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map, retry } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { map, retry, finalize, catchError } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
 import { CookieService } from 'ngx-cookie-service';
+import { AlertController } from '@ionic/angular';
 
 const _credentialKey = 'credential';
 const _tokenKey = 'token';
@@ -16,22 +17,87 @@ const _tokenKey = 'token';
 export class AuthService {
 
   private host: string = environment.host;
+  private debug: boolean = environment.debug;
   private storageCredential: any | null;
   private storageToken: string | null;
 
   constructor(
+    public alertController: AlertController,
     private httpClient: HttpClient,
     private _cookieService: CookieService
   ) { 
-    const savedCredential = this._cookieService.get(_credentialKey);
+    const savedCredential = localStorage.getItem(_credentialKey);
     if (savedCredential && (savedCredential != null || savedCredential !== 'undefined')) {
       this.storageCredential = JSON.parse(savedCredential);
     }
 
-    const savedToken = this._cookieService.get(_tokenKey);
+    const savedToken = localStorage.getItem(_tokenKey);
     if (savedToken && (savedToken != null || savedToken !== 'undefined')) {
       this.storageToken = JSON.parse(savedToken);
     }
+  }
+
+  private async _presentAlert(message: string) {
+    const alert = await this.alertController.create({
+      header: 'Informasi',
+      message: message,
+      buttons: ['OK']
+    });
+
+    await alert.present();
+  }
+
+  /**
+  * Handle error and show it.
+  */
+  private _handleError(error: HttpErrorResponse) {
+    let message = 'Something wrong!';
+    let errorData = error?.error;
+
+    // error as object
+    if (typeof errorData === 'object') {
+      let msgList = [];
+
+      for (let k in errorData) {
+        let e = errorData[k];
+
+        // Check is array
+        if (Array.isArray(e)) {
+          msgList.push(e.join(' '));
+        } else {
+          msgList.push(e);
+        }
+      }
+
+      // Print the message
+      message = msgList.join(' ');
+
+    } else {
+      // Default errorData
+      if (errorData && errorData?.detail) {
+        message = errorData?.detail;
+      }
+    }
+    
+    // Debuh only
+    if (this.debug) {
+      if (error.error instanceof ErrorEvent) {
+        // A client-side or network error occurred. Handle it accordingly.
+        console.error('An error occurred:', errorData?.detail);
+      } else {
+        // The backend returned an unsuccessful response code.
+        // The response body may contain clues as to what went wrong.
+        console.error(
+          `Backend returned code ${error.status}, ` +
+          `body was: ${error.error}`);
+      }
+    }
+
+    // Show error to user
+    this._presentAlert(message);
+
+    // Return an observable with a user-facing error message.
+    return throwError(message);
   }
 
   /**
@@ -43,7 +109,10 @@ export class AuthService {
         retry(3),
         map((response: any) => {
           return response;
-        })
+        }),
+        catchError(
+          (e: HttpErrorResponse) => this._handleError(e)
+        )
       )
   }
 
@@ -62,7 +131,10 @@ export class AuthService {
           });
 
           return response;
-        })
+        }),
+        catchError(
+          (e: HttpErrorResponse) => this._handleError(e)
+        )
       )
   }
 
@@ -78,14 +150,17 @@ export class AuthService {
       .pipe(
         retry(3),
         map((response: any) => {
-          // Customize credentials invalidation here
-          this.setCredential();
-          this.setToken(false);
-
-          this._cookieService.deleteAll();
-          
           return {};
-        })
+        }),
+        finalize(() => {
+          // Customize credentials invalidation here
+          this.setCredential(null);
+          this.setToken(false);
+          this.storageCredential = null;
+        }),
+        catchError(
+          (e: HttpErrorResponse) => this._handleError(e)
+        )
       );
   }
 
@@ -97,9 +172,9 @@ export class AuthService {
     this.storageCredential = credential || null;
 
     if (credential) {
-      this._cookieService.set(_credentialKey, JSON.stringify(credential));
+      localStorage.setItem(_credentialKey, JSON.stringify(credential));
     } else {
-      this._cookieService.delete(_credentialKey);
+      localStorage.removeItem(_credentialKey);
     }
   }
 
@@ -107,7 +182,7 @@ export class AuthService {
    * Get user credential
    */
   getCredential(): any {
-    const savedCredential = this._cookieService.get(_credentialKey);
+    const savedCredential = localStorage.getItem(_credentialKey);
     if (savedCredential && (savedCredential != null || savedCredential !== 'undefined')) {
       return JSON.parse(savedCredential);
     } else {
@@ -122,9 +197,9 @@ export class AuthService {
     this.storageToken = token || null;
 
     if (token) {
-      this._cookieService.set(_tokenKey, JSON.stringify(token));
+      localStorage.setItem(_tokenKey, JSON.stringify(token));
     } else {
-      this._cookieService.delete(_tokenKey);
+      localStorage.removeItem(_tokenKey);
     }
   }
 
@@ -132,7 +207,7 @@ export class AuthService {
    * Get user token
    */
   getToken(): any {
-    const savedToken = this._cookieService.get(_tokenKey);
+    const savedToken = localStorage.getItem(_tokenKey);
     if (savedToken && (savedToken != null || savedToken !== 'undefined')) {
       return JSON.parse(savedToken);
     } else {
@@ -167,7 +242,10 @@ export class AuthService {
         retry(3),
         map((response: any) => {
           return response;
-        })
+        }),
+        catchError(
+          (e: HttpErrorResponse) => this._handleError(e)
+        )
       )
   }
 
@@ -182,7 +260,10 @@ export class AuthService {
         retry(3),
         map((response: any) => {
           return response;
-        })
+        }),
+        catchError(
+          (e: HttpErrorResponse) => this._handleError(e)
+        )
       )
   }
 
@@ -197,7 +278,10 @@ export class AuthService {
         retry(3),
         map((response: any) => {
           return response;
-        })
+        }),
+        catchError(
+          (e: HttpErrorResponse) => this._handleError(e)
+        )
       )
   }
 
@@ -212,7 +296,10 @@ export class AuthService {
         retry(3),
         map((response: any) => {
           return response;
-        })
+        }),
+        catchError(
+          (e: HttpErrorResponse) => this._handleError(e)
+        )
       )
   }
 
@@ -227,7 +314,10 @@ export class AuthService {
         retry(3),
         map((response: any) => {
           return response;
-        })
+        }),
+        catchError(
+          (e: HttpErrorResponse) => this._handleError(e)
+        )
       )
   }
 
@@ -242,7 +332,10 @@ export class AuthService {
         retry(3),
         map((response: any) => {
           return response;
-        })
+        }),
+        catchError(
+          (e: HttpErrorResponse) => this._handleError(e)
+        )
       )
   }
 
@@ -257,7 +350,10 @@ export class AuthService {
         retry(3),
         map((response: any) => {
           return response;
-        })
+        }),
+        catchError(
+          (e: HttpErrorResponse) => this._handleError(e)
+        )
       )
   }
 
@@ -267,12 +363,29 @@ export class AuthService {
   updateProfile(context: any): Observable<any> {
     const url = this.host + '/api/person/users/' + this.credential.uuid + '/profile/';
 
-    return this.httpClient.patch<any>(url, context, {withCredentials: true})
+    let data: any = null;
+
+    // Update has picture
+    if (context.picture) {
+      let body = new FormData();
+      for (let k in context) {
+        body.append(k, context[k]);
+      }
+
+      data = body;
+    } else {
+      data = context;
+    }
+
+    return this.httpClient.patch<any>(url, data, {withCredentials: true})
       .pipe(
         retry(3),
         map((response: any) => {
           return response;
-        })
+        }),
+        catchError(
+          (e: HttpErrorResponse) => this._handleError(e)
+        )
       )
   }
 

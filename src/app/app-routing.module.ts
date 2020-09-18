@@ -15,6 +15,10 @@ const routes: Routes = [
     loadChildren: () => import('./modules/core/splash/splash.module').then(m => m.SplashModule)
   },
   {
+    path: 'home',
+    loadChildren: () => import('./modules/core/home/home.module').then(m => m.HomeModule)
+  },
+  {
     path: 'product',
     loadChildren: () => import('./modules/commerce/product/product.module').then(m => m.ProductModule)
   },

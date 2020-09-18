@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { NavController, IonContent } from '@ionic/angular';
+import { NavController, IonContent, IonInfiniteScroll } from '@ionic/angular';
 import { FormBuilder, Validators } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 
@@ -17,6 +17,7 @@ import { AuthService } from '../../../../services/auth/auth.service';
 export class ChatPageComponent implements OnInit {
 
   @ViewChild(IonContent, {read: IonContent, static: false}) myContent: IonContent;
+  @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
   
   credential: any;
   formFactory: any = FormBuilder;
@@ -29,6 +30,8 @@ export class ChatPageComponent implements OnInit {
   isChatLoading: boolean = false;
   isSendLoading: boolean = false;
   socket: any;
+  file: any;
+  next: string = null;
 
   constructor(
     private _fb: FormBuilder,
@@ -76,10 +79,12 @@ export class ChatPageComponent implements OnInit {
   }
 
   // Create message
-  submitMessage(): void {
+  submitMessage(file: any = ''): void {
     this.isSendLoading = true;
 
-    this._chatService.submitMessage(this.chatUUID, this.formFactory.value)
+    if (file) this.formFactory.value = file.name;
+
+    this._chatService.submitMessage(this.chatUUID, this.formFactory.value, file)
       .pipe(
         finalize(() => {
           this.isSendLoading = false;
@@ -97,12 +102,8 @@ export class ChatPageComponent implements OnInit {
 
           // To end page
           this.scrollToBottom();
-        },
-        (failure: any) => {
-
         }
       )
-
   }
 
   // Load chat object
@@ -126,20 +127,28 @@ export class ChatPageComponent implements OnInit {
   }
 
   // Load chat messages
-  loadMessages(): void {
-    this.isLoading = true;
+  loadMessages(isLoadMore: boolean = false, event: any = ''): void {
+    if (!isLoadMore) this.isLoading = true;
+    let next = this.next;
 
-    this._chatService.getMessages(this.chatUUID)
+    this._chatService.getMessages({'chatUUID': this.chatUUID, 'next': next})
       .pipe(
         finalize(() => {
           this.isLoading = false;
-          this.scrollToBottom();
+          if (isLoadMore) event.target.complete();
         })
       )
       .subscribe(
         (response: any) => {
-          this.messages = response;
-          this.scrollToBottom();
+          if (isLoadMore) {
+            this.messages = response?.results.reverse().concat(this.messages);
+          } else {
+            this.messages = response?.results.reverse();
+            this.scrollToBottom();
+          }
+
+          this.next = response.navigate?.next;
+          if (event && !this.next) event.target.disabled = true;
         },
         (failure: any) => {
 
@@ -147,11 +156,21 @@ export class ChatPageComponent implements OnInit {
       )
   }
 
+  loadData(event: any) {
+    this.loadMessages(true, event);
+  }
+
   startSocket() {
     let access = this.credential ? this.credential.access : '';
-    let ws = (location.protocol === 'https:' ? 'wss' : 'ws');
 
-    this.socket = new WebSocket(ws + '://' + environment.hostName + '/ws/chats/' + this.chatUUID + '/messages/?token=' + access);
+    // Support TLS-specific URLs, when appropriate.
+    if (window.location.protocol == 'https:') {
+      var ws_scheme = 'wss://';
+    } else {
+      var ws_scheme = 'ws://';
+    };
+
+    this.socket = new WebSocket(ws_scheme + environment.hostName + '/ws/chats/' + this.chatUUID + '/messages/?token=' + access);
   
     this.socket.onopen = () => {
       console.log('WebSockets connection created.');
@@ -185,6 +204,14 @@ export class ChatPageComponent implements OnInit {
       'message': message,
       'userUUID': this._authService.getCredential().user_uuid,
     }));
+  }
+
+  fileSelected(event: any): void {
+    this.file = event.target.files[0];
+    this.submitMessage(this.file);
+
+    // reset value
+    event.target.value = '';
   }
 
 }

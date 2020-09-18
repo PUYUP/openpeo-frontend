@@ -31,6 +31,11 @@
           </div>
         </div>
 
+        <div *ngIf="item.buyer_address" class="block mt-2">
+          <p class="text-sm text-gray-600 leading-none">Alamat</p>
+          <p>{{ item.buyer_address }}</p>
+        </div>
+
         <div class="block mt-2">
           <button type="button" (click)="updateOrder(item)" class="bg-green-400 text-white text-xs pr-5 pl-5 pt-1 pb-1 rounded-full shadow-md">
             {{ item.status == 'pending' ? 'Menunggu' : '' }}

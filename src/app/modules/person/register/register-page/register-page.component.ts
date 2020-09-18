@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
-import { AlertController } from '@ionic/angular';
+import { AlertController, NavController } from '@ionic/angular';
+import { Location } from '@angular/common';
 
 import { AuthService } from '../../../../services/auth/auth.service';
 
@@ -21,6 +22,8 @@ export class RegisterPageComponent implements OnInit {
     private _fb: FormBuilder,
     private _router: Router,
     private _authService: AuthService,
+    private _location: Location,
+    public navCtrl: NavController,
     public alertController: AlertController
   ) { }
 
@@ -28,7 +31,7 @@ export class RegisterPageComponent implements OnInit {
     const alert = await this.alertController.create({
       header: 'Informasi',
       message: message,
-      buttons: ['Coba Lagi']
+      buttons: ['OK']
     });
 
     await alert.present();
@@ -40,6 +43,11 @@ export class RegisterPageComponent implements OnInit {
       password: ['', [Validators.required, Validators.minLength(6)]],
       email: ['', [Validators.required, Validators.email]],
     });
+  }
+
+  back(): void {
+    this.navCtrl.setDirection("back", true, "back");
+    this._location.back();
   }
 
   onSubmit(): void {
@@ -62,43 +70,11 @@ export class RegisterPageComponent implements OnInit {
 
           // Login and redirect to profile
           this.login({'username': context.msisdn, 'password': context.password});
-        },
-        (failure: any) => {
-          if (failure) {
-            let error = failure.error;
-
-            // Object error
-            if (typeof error === 'object') {
-              let msgList = [];
-
-              for (let k in error) {
-                let e = error[k];
-
-                // Check is array
-                if (Array.isArray(e)) {
-                  msgList.push(k + ': ' + e.join(' '));
-                } else {
-                  msgList.push(k + ': ' + e);
-                }
-              }
-
-              // Print the message
-              this.message = msgList.join(' ');
-
-            } else {
-              // Default error
-              if (error && error.detail) {
-                this.message = error.detail;
-              }
-            }
-          }
-
-          this.presentAlert(this.message);
         }
       )
   }
 
-  login(context: any, redirectTo: string = '/tabs/tab1'): void {
+  login(context: any, redirectTo: string = '/setting/profile'): void {
     this._authService.login(context)
       .pipe(
         finalize(() => {
@@ -108,11 +84,6 @@ export class RegisterPageComponent implements OnInit {
       .subscribe(
         (response: any) => {
           this._router.navigate([redirectTo], {replaceUrl: true});
-        },
-        (failure: any) => {
-          if (failure && failure.error && failure.error.detail) {
-            this.message = failure.error.detail;
-          }
         }
       )
   }

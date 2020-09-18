@@ -6,22 +6,42 @@
       </ion-button>
     </ion-buttons>
 
-    <ion-title>{{ isChatLoading ? 'Memuat...' : chat.send_to_username }}</ion-title>
+    <ion-title>{{ isChatLoading ? 'Memuat...' : chat.send_to_name }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div *ngIf="!isLoading && messages" class="pt-4 ion-padding">
+  <ion-infinite-scroll *ngIf="!isLoading && messages" threshold="100px" (ionInfinite)="loadData($event)" position="top">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <ion-list *ngIf="!isLoading && messages" class="pt-4 ion-padding">
     <div *ngFor="let item of messages" class="clearfix">
       <div *ngIf="!item.is_creator" class="w-3/4 mx-0 my-1">
         <div class="bg-gray-300 rounded-lg">
-          <div *ngIf="item.product" routerLink="{{ item.orderitem ? '/order/' + item.orderitem.order_uuid : '/product/' + item.product.uuid }}" class="bg-red-200 rounded-t-lg p-2 mb-1">
+          <div *ngIf="item.product" routerLink="{{ item.orderitem ? (item.orderitem.is_seller ? '/selling/' + item.product.uuid : '/order/' + item.orderitem.order_uuid) : '/product/' + item.product.uuid }}" class="bg-red-200 rounded-t-lg p-2 mb-1">
             <p class="text-md">{{ item.product.name }}</p>
             <p class="leading-none text-sm">Rp {{ item.product.price | number }}</p>
+
+            <div *ngIf="item.orderitem && item.orderitem.status != 'pending'" class="leading-none text-sm mt-2">
+              <p class="mb-2">Sub-total Rp {{ item.orderitem.total | number }}</p>
+              <p class="mb-2">Ongkir Rp {{ item.orderitem.shipping_cost | number }}</p>
+              <p class="mb-2">Total bayar Rp {{ item.orderitem.total + item.orderitem.shipping_cost | number }}</p>
+            </div>
           </div>
 
           <p class="p-2">{{ item.message }}</p>
-          <button *ngIf="item.orderitem && item.orderitem.status == 'confirmed'" type="button" class="bg-red-500 text-sm m-2 rounded-lg p-2 pr-4 pl-4 text-white" routerLink="/payment/{{ item.orderitem.order_uuid }}">Lihat Rekening</button>
+
+          <div *ngIf="item.chat_message_attachments.length > 0">
+            <p *ngFor="let attach of item.chat_message_attachments">
+              <img src="{{ attach.attach_file }}">
+            </p>
+          </div>
+
+          <button *ngIf="item.orderitem && item.orderitem.status != 'pending'" type="button" class="bg-red-500 text-sm m-2 rounded-lg p-2 pr-4 pl-4 text-white" routerLink="/payment/{{ item.orderitem.order_uuid }}">Lihat Rekening</button>
         </div>
 
         <span class="text-xs text-gray-600 pl-1">{{ item.create_date | date: 'HH:MM' }}</span>
@@ -29,23 +49,38 @@
 
       <div *ngIf="item.is_creator" class="float-right w-3/4 mx-0 my-1 clearfix">
         <div class="bg-green-300 rounded-lg">
-          <div *ngIf="item.product" routerLink="{{ item.orderitem ? '/order/' + item.orderitem.order_uuid : '/product/' + item.product.uuid }}" class="bg-red-200 rounded-t-lg p-2 mb-1">
+          <div *ngIf="item.product" routerLink="{{ item.orderitem ? (item.orderitem.is_seller ? '/selling/' + item.product.uuid : '/order/' + item.orderitem.order_uuid) : '/product/' + item.product.uuid }}" class="bg-red-200 rounded-t-lg p-2 mb-1">
             <p class="text-md">{{ item.product.name }}</p>
             <p class="leading-none text-sm">Rp {{ item.product.price | number }}</p>
+            
+            <div *ngIf="item.orderitem && item.orderitem.status != 'pending'" class="leading-none text-sm mt-2">
+              <p class="mb-2">Sub-total Rp {{ item.orderitem.total | number }}</p>
+              <p class="mb-2">Ongkir Rp {{ item.orderitem.shipping_cost | number }}</p>
+              <p class="mb-2">Total bayar Rp {{ item.orderitem.total + item.orderitem.shipping_cost | number }}</p>
+            </div>
           </div>
 
           <p class="p-2">{{ item.message }}</p>
-          <button *ngIf="item.orderitem && item.orderitem.status == 'confirmed'" type="button" class="bg-red-500 text-sm m-2 rounded-lg p-2 pr-4 pl-4 text-white" routerLink="/payment/{{ item.orderitem.order_uuid }}">Lihat Rekening</button>
+
+          <div *ngIf="item.chat_message_attachments.length > 0">
+            <p *ngFor="let attach of item.chat_message_attachments">
+              <img src="{{ attach.attach_file }}">
+            </p>
+          </div>
+
+          <button *ngIf="item.orderitem && item.orderitem.status != 'pending'" type="button" class="bg-red-500 text-sm m-2 rounded-lg p-2 pr-4 pl-4 text-white" routerLink="/payment/{{ item.orderitem.order_uuid }}">Lihat Rekening</button>
         </div>
 
         <span class="text-xs text-gray-600 float-right pr-1">{{ item.create_date | date: 'HH:MM' }}</span>
       </div>
     </div>
-  </div>
+  </ion-list>
 </ion-content>
 
 <ion-footer>
   <ion-toolbar class="bg-gray-200">
+    <input type="file" (change)="fileSelected($event)" class="hidden" #fileInput accept="image/x-png,image/gif,image/jpeg" />
+
     <form [formGroup]="formFactory" (ngSubmit)="onSubmit()" class="w-full flex justify-between items-center" ngNativeValidate>
       <div class="mr-auto w-full" [ngStyle]="{'height.px': '40'}">
         <textarea
@@ -61,7 +96,7 @@
 
       <div class="pl-2 pr-2">
         <ion-buttons>
-          <ion-button type="button">
+          <ion-button type="button" (click)="fileInput.click()">
             <ion-icon slot="icon-only" name="image-outline"></ion-icon>
           </ion-button>
 

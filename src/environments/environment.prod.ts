@@ -1,6 +1,7 @@
 export const environment = {
   production: true,
-  appName: 'Open Peo',
-  host: 'https://openpeo.herokuapp.com',
-  hostName: 'openpeo.herokuapp.com',
+  appName: 'Open Pe O',
+  host: 'https://api.openpeo.com',
+  hostName: 'api.openpeo.com',
+  debug: true,
 };

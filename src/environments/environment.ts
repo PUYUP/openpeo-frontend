@@ -4,9 +4,10 @@
 
 export const environment = {
   production: false,
-  appName: 'Open Peo',
+  appName: 'Open Pe O',
   host: 'http://127.0.0.1:8000',
   hostName: '127.0.0.1:8000',
+  debug: true,
 };
 
 /*

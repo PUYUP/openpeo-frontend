@@ -91,7 +91,6 @@ export class SellingPageComponent implements OnInit {
   }
 
   updateOrder(item: any): void {
-    console.log(item);
     this.presentModal(item);
   }
 

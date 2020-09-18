@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
-  <ion-toolbar color="danger">
+  <ion-toolbar color="orange">
     <ion-buttons slot="start">
-      <ion-button routerLink="/splash">
+      <ion-button (click)="back()">
         <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -40,7 +40,7 @@
       </div>
 
       <div class="mt-6 pt-4">
-        <ion-button color="danger" mode="ios" expand="block" type="submit" [disabled]="!formFactory.valid || isLoading">Register</ion-button>
+        <ion-button color="orange" mode="ios" expand="block" type="submit" [disabled]="!formFactory.valid || isLoading">Register</ion-button>
       </div>
     </form>
   </div>

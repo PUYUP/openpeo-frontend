@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ChatService } from '../services/commerce/chat.service';
 import { finalize } from 'rxjs/operators';
+import { IonInfiniteScroll } from '@ionic/angular';
 
 @Component({
   selector: 'app-tab4',
@@ -9,8 +10,11 @@ import { finalize } from 'rxjs/operators';
 })
 export class Tab4Page implements OnInit {
 
+  @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
+  
   chats: any = [];
   isLoading: boolean = false;
+  next: string = null;
 
   constructor(
     private _chatService: ChatService
@@ -20,21 +24,33 @@ export class Tab4Page implements OnInit {
     this.loadChats();
   }
 
-  loadChats(): void {
-    this._chatService.list()
+  loadChats(isLoadMore: boolean = false, event: any = ''): void {
+    if (!isLoadMore) this.isLoading = true;
+    let next = this.next;
+
+    this._chatService.list({'next': next})
       .pipe(
         finalize(() => {
           this.isLoading = false;
+          if (isLoadMore) event.target.complete();
         })
       )
       .subscribe(
         (response: any) => {
-          this.chats = response;
-        },
-        (failure: any) => {
+          if (isLoadMore) {
+            this.chats = this.chats.concat(response?.results)
+          } else {
+            this.chats = response?.results;
+          }
 
+          this.next = response.navigate?.next;
+          if (event && !this.next) event.target.disabled = true;
         }
       )
+  }
+
+  loadData(event: any) {
+    this.loadChats(true, event);
   }
 
 }

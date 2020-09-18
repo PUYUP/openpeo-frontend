@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
@@ -12,18 +12,24 @@ import { CookieService } from 'ngx-cookie-service';
 import { HTTPInterceptor } from './services/http.interceptor';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { DecimalPipe, registerLocaleData } from '@angular/common';
+import { CookieModule } from 'ngx-cookie';
+
+import localeId from '@angular/common/locales/id';  
+registerLocaleData(localeId, 'id');
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [
     HttpClientModule,
+    BrowserModule,
+    CookieModule.forRoot(),
+    IonicModule.forRoot(),
     HttpClientXsrfModule.withOptions({
       cookieName: 'csrftoken',
-      headerName: 'X-CSRFToken'
+      headerName: 'X-CSRFToken',
     }),
-    BrowserModule,
-    IonicModule.forRoot(),
     AppRoutingModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
@@ -34,7 +40,9 @@ import { environment } from '../environments/environment';
       provide: HTTP_INTERCEPTORS,
       useClass: HTTPInterceptor,
       multi: true
-    }
+    },
+    DecimalPipe,
+    {provide: LOCALE_ID, useValue: 'id-ID'}
   ],
   bootstrap: [AppComponent]
 })

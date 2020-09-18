@@ -19,6 +19,8 @@ export class EditorComponent implements OnInit {
   message: string;
   product: any;
   productUUID: string;
+  imageURL: string;
+  attachmentData: any;
 
   monthNames = [
     "January", 
@@ -38,6 +40,11 @@ export class EditorComponent implements OnInit {
   monthNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   monthList = [];
   yearList = [];
+  geoMessage: string;
+  latitude: string;
+  longitude: string;
+  isGeolocation: boolean = false;
+  isLocationRetrieve: boolean = true;
 
   constructor(
     public navCtrl: NavController,
@@ -50,55 +57,39 @@ export class EditorComponent implements OnInit {
     public alertController: AlertController
   ) { }
 
-  async presentWarningAlert(message: string) {
-    const alert = await this.alertController.create({
-      message: message,
-      buttons: [
-        {
-          text: 'Tutup',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: (blah) => {
-            console.log('Confirm Cancel: blah');
-          }
-        }
-      ]
-    });
-
-    await alert.present();
+  getLocation() {
+    this.isLocationRetrieve = false;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(this.showPosition, this.showError);
+    } else { 
+      this.geoMessage = "Geolocation is not supported by this browser.";
+    }
   }
 
-  failureCapture(failure: any): void{
-    if (failure) {
-      let error = failure.error;
+  showPosition = (position: any) => {
+    this.latitude = position.coords.latitude;
+    this.longitude = position.coords.longitude;
 
-      // Object error
-      if (typeof error === 'object') {
-        let msgList = [];
+    this.isLocationRetrieve = true;
+  }
 
-        for (let k in error) {
-          let e = error[k];
-
-          // Check is array
-          if (Array.isArray(e)) {
-            msgList.push(e.join(' '));
-          } else {
-            msgList.push(e);
-          }
-        }
-
-        // Print the message
-        this.message = msgList.join(' ');
-
-      } else {
-        // Default error
-        if (error && error.detail) {
-          this.message = error.detail;
-        }
-      }
+  showError = (error: any) => {
+    switch(error.code) {
+      case error.PERMISSION_DENIED:
+        this.geoMessage = "User denied the request for Geolocation."
+        break;
+      case error.POSITION_UNAVAILABLE:
+        this.geoMessage = "Location information is unavailable."
+        break;
+      case error.TIMEOUT:
+        this.geoMessage = "The request to get user location timed out."
+        break;
+      case error.UNKNOWN_ERROR:
+        this.geoMessage = "An unknown error occurred."
+        break;
     }
 
-    this.presentWarningAlert(this.message);
+    this.isLocationRetrieve = true;
   }
 
   ngOnInit() {
@@ -117,8 +108,11 @@ export class EditorComponent implements OnInit {
     }
 
     // Generate years
-    var currentYear = new Date().getFullYear();
-    var startYear = 2018;  
+    let currentDay = new Date().getDate();
+    let currentMonth = new Date().getMonth() + 1;
+    let currentYear = new Date().getFullYear();
+    let startYear = 2018;  
+
     while ( startYear <= currentYear ) {
       this.yearList.push(startYear++ + 1);
     }
@@ -126,15 +120,16 @@ export class EditorComponent implements OnInit {
     // Initial form
     this.formFactory = this._fb.group({
       name: ['', [Validators.required]],
-      deadline_day: ['', [Validators.required]],
-      deadline_month: ['', [Validators.required]],
-      deadline_year: ['', [Validators.required]],
-      delivery_day: ['', [Validators.required]],
-      delivery_month: ['', [Validators.required]],
-      delivery_year: ['', [Validators.required]],
+      deadline_day: [currentDay, [Validators.required]],
+      deadline_month: [currentMonth, [Validators.required]],
+      deadline_year: [currentYear, [Validators.required]],
+      delivery_day: [currentDay+7, [Validators.required]],
+      delivery_month: [currentMonth, [Validators.required]],
+      delivery_year: [currentYear, [Validators.required]],
       description: ['', [Validators.required]],
       price: ['', [Validators.required]],
       is_active: [false, [Validators.required]],
+      is_geolocation: [false, [Validators.required]],
     });
   }
 
@@ -143,21 +138,39 @@ export class EditorComponent implements OnInit {
     this._location.back();
   }
 
+  locationSet(event: any) {
+    this.isGeolocation = this.formFactory.value.is_geolocation;
+    if (this.getLocation) {
+      this.getLocation();
+    } else {
+      this.latitude = '';
+      this.longitude = '';
+    }
+  }
+
   onSubmit(): void {
     const order_deadline = new Date(
       this.formFactory.value.deadline_year, 
-      this.formFactory.value.deadline_month,
+      +this.formFactory.value.deadline_month - 1,
       this.formFactory.value.deadline_day
     )
 
     const delivery_date = new Date(
       this.formFactory.value.delivery_year, 
-      this.formFactory.value.delivery_month,
+      +this.formFactory.value.delivery_month - 1,
       this.formFactory.value.delivery_day
     )
 
     this.formFactory.value.order_deadline = order_deadline;
     this.formFactory.value.delivery_date = delivery_date;
+
+    if (this.isGeolocation) {
+      this.formFactory.value.latitude = this.latitude;
+      this.formFactory.value.longitude = this.longitude;
+    } else {
+      this.formFactory.value.latitude = null;
+      this.formFactory.value.longitude = null;
+    }
     
     if (this.productUUID) {
       this.edit(this.formFactory.value);
@@ -176,13 +189,23 @@ export class EditorComponent implements OnInit {
       .subscribe(
         (response: any) => {
           this.product = response;
-          this._router.navigate(['/product', this.product.uuid], {replaceUrl: true});
+          this.productUUID = this.product.uuid;
+          
+          // Upload attachment
+          if (this.attachmentData) {
+            const x = {
+              ...this.attachmentData,
+              'product': this.product.id,
+            }
+            this.uploadAttachment(x, true);
 
-          // trigger sell page
-          this._eventService.publish('commerce:productCreated', {'product': this.product});
-        },
-        (failure: any) => {
-          this.failureCapture(failure);
+          } else {
+            // to detail
+            this._router.navigate(['/product', this.product.uuid], {replaceUrl: true});
+          
+            // trigger sell page
+            this._eventService.publish('commerce:productCreated', this.product);
+          }
         }
       )
   }
@@ -200,10 +223,7 @@ export class EditorComponent implements OnInit {
           this._router.navigate(['/product', this.product.uuid], {replaceUrl: true});
 
           // trigger sell page
-          this._eventService.publish('commerce:productUpdated', {'product': this.product});
-        },
-        (failure: any) => {
-          this.failureCapture(failure);
+          this._eventService.publish('commerce:productUpdated', this.product);
         }
       )
   }
@@ -220,10 +240,7 @@ export class EditorComponent implements OnInit {
           this._router.navigate(['/tabs/tab1/sell'], {replaceUrl: true});
 
           // trigger sell page
-          this._eventService.publish('commerce:productDeleted', {'productUUID': this.productUUID});
-        },
-        (failure: any) => {
-
+          this._eventService.publish('commerce:productDeleted', this.product);
         }
       )
   }
@@ -239,6 +256,10 @@ export class EditorComponent implements OnInit {
       .pipe(
         finalize(() => {
           this.isLoading = false;
+
+          if (this.product.latitude) {
+            this.isGeolocation = true;
+          }
         })
       )
       .subscribe(
@@ -259,35 +280,42 @@ export class EditorComponent implements OnInit {
             description: this.product.description,
             price: this.product.price,
             is_active: this.product.is_active,
+            is_geolocation: (this.product.latitude && this.product.longitude ? true : false),
           });
-        },
-        (failure: any) => {
-
         }
       )
   }
 
   fileChangeEvent(event: any): void {
     let file = event.target.files[0];
-    let data = {
+    this.attachmentData = {
       'attach_file': file, 
       'title': file.name, 
-      'product': this.product.id
+      'product': this.product?.id
     };
+
+    console.log(file);
 
     // open dialog
     if (this.product) {
-      this.uploadAttachment(data);
+      this.uploadAttachment(this.attachmentData);
     } else {
-      console.log(data);
-      console.log('B');
+
+      if (!this.product) {
+        // File Preview
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.imageURL = reader.result as string;
+        }
+        reader.readAsDataURL(file)
+      }
     }
 
     // clear file value
     event.target.value = '';
   }
 
-  uploadAttachment(data: any): void {
+  uploadAttachment(data: any, isNew: boolean = false): void {
     this._productService.createAttachment(this.productUUID, data)
       .pipe(
         finalize(() => {
@@ -297,9 +325,14 @@ export class EditorComponent implements OnInit {
       .subscribe(
         (response: any) => {
           this.product.picture = response.attach_file;
-        },
-        (failure: any) => {
 
+          if (isNew) {
+            // to detail
+            this._router.navigate(['/product', this.product.uuid], {replaceUrl: true});
+          
+            // trigger sell page
+            this._eventService.publish('commerce:productCreated', this.product);
+          }
         }
       )
   }

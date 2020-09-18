@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="orange">
     <ion-title>
-      Setelan
+      Setting
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -9,8 +9,9 @@
 <ion-content [fullscreen]="true">
   <ion-item detail mode="ios" lines="full" routerLink="/setting/profile">
     <ion-avatar slot="start">
-        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
-      </ion-avatar>
+      <img *ngIf="!credential.picture" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
+      <img *ngIf="credential.picture" src="{{ credential.picture }}" width="36" height="36">
+    </ion-avatar>
 
     <ion-label>
       <div class="font-semibold text-black text-lg">{{ credential.first_name ? credential.first_name : credential.username }}</div>
@@ -47,7 +48,7 @@
   </ion-item>
 
   <ion-item detail mode="ios" lines="full" (click)="logout()">
-    <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
+    <ion-icon name="log-out-outline" slot="start" color="orange"></ion-icon>
 
     <ion-label>
       Logout

@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../services/auth/auth.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, NavController } from '@ionic/angular';
 import { finalize } from 'rxjs/operators';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-login-page',
@@ -20,6 +21,8 @@ export class LoginPageComponent implements OnInit {
     private _fb: FormBuilder,
     private _router: Router,
     private _authService: AuthService,
+    private _location: Location,
+    public navCtrl: NavController,
     public alertController: AlertController
   ) { }
 
@@ -27,7 +30,7 @@ export class LoginPageComponent implements OnInit {
     const alert = await this.alertController.create({
       header: 'Informasi',
       message: message,
-      buttons: ['Coba Lagi']
+      buttons: ['OK']
     });
 
     await alert.present();
@@ -38,6 +41,11 @@ export class LoginPageComponent implements OnInit {
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
+  }
+
+  back(): void {
+    this.navCtrl.setDirection("back", true, "back");
+    this._location.back();
   }
 
   onSubmit(): void {

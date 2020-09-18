@@ -3,8 +3,9 @@
     <ion-spinner class="ml-auto mr-auto"></ion-spinner>
   </div>
 
+  <ion-button color="orange" mode="ios" expand="block" routerLink='/product/editor' type="button">Tambah Produk</ion-button>
+
   <ion-list *ngIf="!isLoading && products" [ngStyle]="{'padding.px': '4'}">
-    
       <div *ngFor="let item of products" class="rounded overflow-hidden shadow shadow-sm bg-white p-3 mb-5 leading-normal" routerLink="/product/{{ item.uuid }}/editor">
         <div class="flex items-center">
           <div class="mr-3 w-32 h-auto">
@@ -17,7 +18,7 @@
 
           <div class="w-full">
             <p class="text-gray-900 leading-5 mb-0" [ngStyle]="{'font-size.px': '15'}">{{ item.name }}</p>
-            <p class="text-gray-900 text-lg">Rp. {{ item.price | number }}</p>
+            <p class="text-gray-900 text-lg">Rp {{ item.price | number }}</p>
 
             <div class="flex flex-grow items-end mt-2">
               <div class="block">
@@ -41,8 +42,12 @@
           </div>
         </div>
       </div>
-
   </ion-list>
 
-  <ion-button color="orange" mode="ios" expand="block" routerLink='/product/editor' type="button">Tambah Produk</ion-button>
+  <ion-infinite-scroll *ngIf="!isLoading && products" threshold="100px" (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </div>

@@ -21,6 +21,9 @@ export class DetailComponent implements OnInit {
   isChatLoading: boolean = false;
   itemQty: number = 0;
   message: string = '';
+  toolbarBackground: string = 'transparent';
+  showTitle: boolean = false;
+  elNavigator: any;
 
   constructor(
     public alertController: AlertController,
@@ -76,42 +79,44 @@ export class DetailComponent implements OnInit {
     await alert.present();
   }
 
-  failureCapture(failure: any): void{
-    if (failure) {
-      let error = failure.error;
-
-      // Object error
-      if (typeof error === 'object') {
-        let msgList = [];
-
-        for (let k in error) {
-          let e = error[k];
-
-          // Check is array
-          if (Array.isArray(e)) {
-            msgList.push(e.join(' '));
-          } else {
-            msgList.push(e);
-          }
-        }
-
-        // Print the message
-        this.message = msgList.join(' ');
-
-      } else {
-        // Default error
-        if (error && error.detail) {
-          this.message = error.detail;
-        }
-      }
-    }
-
-    this.presentWarningAlert(this.message);
-  }
-
   ngOnInit() {
+    this.elNavigator = window.navigator;
     this.productUUID = this._activatedRoute.snapshot.paramMap.get('product_uuid');
     this.loadProduct();
+  }
+
+  share() {
+    if (this.elNavigator && this.elNavigator.share) {
+      this.elNavigator.share({
+        title: 'Open Pe O',
+        text: 'Hay! Yuk belanja.',
+        url: document.location.href,
+      })
+      .then(() => console.log('Successful share'))
+      .catch((error) => console.log('Error sharing', error));
+    }
+  }
+
+  logScrollStart() {
+
+  }
+
+  logScrolling(event: any) {
+    const scrollTop = event.detail?.scrollTop;
+    
+    if (scrollTop > 100) {
+      this.toolbarBackground = '#F64C4C';
+      this.showTitle = true;
+    }
+
+    if (scrollTop < 50) {
+      this.toolbarBackground = 'transparent';
+      this.showTitle = false;
+    }
+  }
+
+  logScrollEnd() {
+
   }
 
   back(): void {
@@ -168,9 +173,6 @@ export class DetailComponent implements OnInit {
           </div>`;
 
           this.presentAlert(message);
-        },
-        (failure: any) => {
-          this.failureCapture(failure);
         }
       )
   }
@@ -198,9 +200,6 @@ export class DetailComponent implements OnInit {
       .subscribe(
         (response: any) => {
           this._router.navigate(['/chat', response.uuid]);
-        },
-        (failure: any) => {
-          this.failureCapture(failure);
         }
       )
   }

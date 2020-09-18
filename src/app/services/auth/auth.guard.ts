@@ -42,7 +42,7 @@ export class AuthLoggedInGuard implements CanActivate {
 
   canActivate(): boolean {
     if (!this._authService.isAuthenticated()) {
-      this._router.navigate(['/login'], {replaceUrl: true});
+      this._router.navigate(['/login'], {replaceUrl: false});
       return false;
     }
 

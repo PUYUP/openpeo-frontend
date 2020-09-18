@@ -1,14 +1,26 @@
 <ion-header [translucent]="true" class="header-top">
-  <ion-toolbar color="orange">
+  <ion-toolbar color="orange" class="ion-color" [style.background-color]="toolbarBackground">
     <ion-buttons slot="start">
       <ion-button (click)="back()">
         <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
+
+    <ion-title *ngIf="showTitle">Detil Produk</ion-title>
+
+    <ion-buttons slot="end" class="pr-4">
+      <ion-button (click)="share()">
+        SHARE
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" [scrollEvents]="true"
+  (ionScrollStart)="logScrollStart()"
+  (ionScroll)="logScrolling($event)"
+  (ionScrollEnd)="logScrollEnd()">
+
   <div *ngIf="isLoading" class="ion-padding">
     <div class="flex w-full">
       <ion-spinner class="ml-auto mr-auto"></ion-spinner>
@@ -30,6 +42,11 @@
 
     <div class="ion-padding">
       <div class="flex w-full items-center mb-4">
+        <div [ngStyle]="{'width.px': '36', 'height.px': '36'}" class="mr-2">
+          <img *ngIf="!product.seller_picture" [ngStyle]="{'width.px': '36', 'height.px': '36'}" class="rounded-full" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
+          <img *ngIf="product.seller_picture" [ngStyle]="{'width.px': '36', 'height.px': '36'}" class="rounded-full" src="{{ product.seller_picture }}">
+        </div>
+
         <div class="font-semibold">
           {{ product.seller_name }}
         </div>
@@ -58,7 +75,7 @@
 
       <div class="mb-3 mt-5 pb-4 border-solid border-gray-300 border-b">
         <p class="text-xl font-semibold mb-1">Harga</p>
-        <p class="font-semibold text-3xl leading-none">Rp. {{ product.price | number }},-</p>
+        <p class="font-semibold text-3xl leading-none">Rp {{ product.price | number }},-</p>
 
         <p class="flex items-center w-full text-sm text-gray-600 mt-3">
           <img src="assets/icon/exclamation.svg" class="mr-2">

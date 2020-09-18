@@ -5,6 +5,7 @@ import { AuthService } from '../../../../services/auth/auth.service';
 import { EventService } from '../../../../services/event.service';
 import { finalize } from 'rxjs/operators';
 import { FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-setting-profile',
@@ -18,11 +19,13 @@ export class SettingProfileComponent implements OnInit {
   creadential: any;
   isLoading: boolean = false;
   isSaveLoading: boolean = false;
+  file: any;
 
   constructor(
     public navCtrl: NavController,
     private _location: Location,
     private _fb: FormBuilder,
+    private _router: Router,
     private _authService: AuthService,
     private _eventService: EventService
   ) { }
@@ -122,9 +125,51 @@ export class SettingProfileComponent implements OnInit {
 
           // trigger change
           this._eventService.publish('person:updateProfile', {});
+
+          // redirect to profile page
+          this._router.navigate(['/tabs/tab5'], {replaceUrl: true})
         },
         (failure: any) => {
 
+        }
+      )
+  }
+
+  pictureChangeEvent(event: any): void {
+    this.file = event.target.files[0];
+    this._savePicture();
+
+    // reset value
+    event.target.value = '';
+  }
+
+  /***
+   * Upload and save Picture
+   */
+  private _savePicture(): void {
+    this.isLoading = true;
+
+    let data = {
+      'picture': this.file,
+      'picture_original': this.file,
+    }
+
+    this._authService.updateProfile(data)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe(
+        (response: any) => {
+          this.user.profile.picture = response.picture;
+
+          // update credential
+          this.creadential.picture = response.picture;
+          this._authService.setCredential(this.creadential);
+
+          // trigger change
+          this._eventService.publish('person:updateProfile', {});
         }
       )
   }

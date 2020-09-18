@@ -33,8 +33,6 @@ export class Tab5Page implements OnInit {
   }
 
   logout(): void {
-    event.preventDefault();
-
     this._authService.logout()
       .pipe(
         finalize(() => {
@@ -42,10 +40,7 @@ export class Tab5Page implements OnInit {
       )
       .subscribe(
         (response: any) => {
-          this._router.navigate(['/splash'], {replaceUrl: true});
-        },
-        (failure: any) => {
-          
+          this._router.navigate(['/home'], {replaceUrl: true});
         }
       )
   }
