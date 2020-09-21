@@ -1,4 +1,29 @@
 <div class="ion-padding">
+  <div class="block">
+    <div class="flex w-full mb-4 items-center">
+      <div class="mr-auto">
+        <div class="flex items-center">
+          <img src="assets/icon/map-marker.svg">
+          <span class="text-gray-500 text-size-10 pl-2">{{ radius ? radius + ' km' : 'Dalam radius (km)' }}</span>
+        </div>
+      </div>
+
+      <div class="block">
+        <button type="button" class="border border-solid border-gray-300 bg-none pl-3 pr-3 pt-1 pb-1 rounded text-gray-600 text-sm" (click)="getLocation()">Masukkan jarak</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex w-full mb-6">
+    <div class="w-full pr-4">
+      <ion-input (ionChange)="searchChange($event)" debounce="1500" [ngStyle]="{'height.px': 36}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="search-product" type="text" placeholder="Search product..."></ion-input>
+    </div>
+
+    <div class="ml-auto">
+      <ion-button color="orange" class="m-0">Filter</ion-button>
+    </div>
+  </div>
+
   <ion-slides *ngIf="slides.length > 0" pager="true" [options]="slideOpts" class="mb-4">
     <ion-slide *ngFor="let item of slides">
       <img src="{{ item.image }}">
@@ -10,49 +35,51 @@
   </div>
 
   <ion-list *ngIf="!isLoading && products" [ngStyle]="{'padding.px': '4'}">
-      <div *ngFor="let item of products" class="rounded overflow-hidden shadow shadow-sm bg-white p-3 mb-5 leading-normal" routerLink="/product/{{ item.uuid }}">
-        <div class="flex items-center">
-          <div class="mr-3 w-32 h-auto">
-            <div class="ratio-full">
-              <div class="ratio-full-content">
-                <img class="image-full rounded" src="{{ item.picture ? item.picture : 'assets/no-image.png' }}" alt="{{ item.name }}">
-              </div>
+    <div *ngFor="let item of products" class="rounded overflow-hidden shadow shadow-sm bg-white p-3 mb-5 leading-normal" routerLink="/product/{{ item.uuid }}">
+      <div class="flex items-center">
+        <div class="mr-3 w-32 h-auto">
+          <div class="ratio-full">
+            <div class="ratio-full-content">
+              <img class="image-full rounded" src="{{ item.picture ? item.picture : 'assets/no-image.png' }}" alt="{{ item.name }}">
             </div>
           </div>
+        </div>
 
-          <div class="w-full">
-            <p class="text-gray-900 leading-5 mb-0" [ngStyle]="{'font-size.px': '15'}">{{ item.name }}</p>
-            <p class="text-gray-900 text-lg">Rp {{ item.price | number }}</p>
+        <div class="w-full">
+          <p class="text-gray-900 leading-5 mb-0" [ngStyle]="{'font-size.px': '15'}">{{ item.name }}</p>
+          <p class="text-gray-900 text-lg">Rp {{ item.price | number }}</p>
 
-            <div class="flex flex-grow items-end mt-2">
-              <div class="block">
-                <span *ngIf="item.is_active" [ngStyle]="{'font-size.px': '12'}" class="flex items-center">
-                  <img src="assets/icon/green-dot.svg" class="inline-block mr-1">
-                  Available
-                </span>
+          <div class="flex flex-grow items-end mt-2">
+            <div class="block">
+              <span *ngIf="item.distance || item.distance == 0" [ngStyle]="{'font-size.px': '12'}" class="block text-gray-600 leading-none mb-1 text-xs">{{ item.distance }} km</span>
 
-                <span *ngIf="!item.is_active" [ngStyle]="{'font-size.px': '12'}" class="flex items-center">
-                  <img src="assets/icon/gray-dot.svg" class="inline-block mr-1">
-                  Available
-                </span>
-              </div>
+              <span *ngIf="item.is_active" [ngStyle]="{'font-size.px': '12'}" class="flex items-center leading-none">
+                <img src="assets/icon/green-dot.svg" class="inline-block mr-1">
+                Available
+              </span>
 
-              <div class="ml-auto">
-                <div class="flex items-end">
-                  <div class="pr-3">
-                    <img src="assets/icon/truck.svg" alt="Delivery date">
-                  </div>
+              <span *ngIf="!item.is_active" [ngStyle]="{'font-size.px': '12'}" class="flex items-center leading-none">
+                <img src="assets/icon/gray-dot.svg" class="inline-block mr-1">
+                Available
+              </span>
+            </div>
 
-                  <div>
-                    <p class="text-gray-600 leading-none mb-1 text-xs">Diantar</p>
-                    <p class="text-gray-800 leading-none text-sm">{{ item.delivery_date | date: 'dd.MM.yyyy' }}</p>
-                  </div>
-                </div> <!-- send date -->
-              </div>
+            <div class="ml-auto">
+              <div class="flex items-end">
+                <div class="pr-3">
+                  <img src="assets/icon/truck.svg" alt="Delivery date">
+                </div>
+
+                <div>
+                  <p class="text-gray-600 leading-none mb-1 text-xs">Diantar</p>
+                  <p class="text-gray-800 leading-none text-sm">{{ item.delivery_date | date: 'dd.MM.yyyy' }}</p>
+                </div>
+              </div> <!-- send date -->
             </div>
           </div>
         </div>
       </div>
+    </div>
   </ion-list>
 
   <ion-infinite-scroll *ngIf="!isLoading && products" threshold="100px" (ionInfinite)="loadData($event)">

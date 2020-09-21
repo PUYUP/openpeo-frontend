@@ -16,27 +16,31 @@
   </div>
 
   <div class="p-3">
-    <div *ngFor="let item of cartItemsExted" class="overflow-hidden bg-white mb-5 leading-normal order-item" (click)="removeItem(item)">
-      <div class="flex w-full items-center">
-        <img class="w-12 h-12 rounded mr-3" src="{{ item.picture ? item.picture : 'assets/no-image.png' }}" alt="{{ item.product_name }}">
+    <ng-container *ngIf="orderItemsExted.length > 0">
+      <div *ngFor="let item of orderItemsExted" class="overflow-hidden bg-white mb-5 leading-normal order-item" (click)="removeItem(item)">
+        <div class="flex w-full items-center">
+          <img class="w-12 h-12 rounded mr-3" src="{{ item.picture ? item.picture : 'assets/no-image.png' }}" alt="{{ item.product_name }}">
 
-        <div class="block w-full flex flex-col">
-          <div class="flex w-full items-center">
-            <div class="w-full pr-2">
-              <p class="text-gray-900 leading-5 font-bold" [ngStyle]="{'font-size.px': '15'}">{{ item.product_name }}</p>
-            </div>
-            
-            <div class="ml-auto">
-              <img *ngIf="!item.is_removed" src="assets/icon/check-gray.svg">
-              <img *ngIf="item.is_removed" src="assets/icon/check-red.svg">
+          <div class="block w-full flex flex-col">
+            <div class="flex w-full items-center">
+              <div class="w-full pr-2">
+                <p class="text-gray-900 leading-5 font-bold" [ngStyle]="{'font-size.px': '15'}">{{ item.product_name }}</p>
+              </div>
+              
+              <div class="ml-auto">
+                <img *ngIf="!item.is_removed" src="assets/icon/check-gray.svg">
+                <img *ngIf="item.is_removed" src="assets/icon/check-red.svg">
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="mt-6 pt-4 pb-4">
-      <ion-button (click)="removeSelectedItem()" color="orange" mode="ios" expand="block" type="button">Batalkan Pesanan</ion-button>
-    </div>
+      <div class="mt-6 pt-4 pb-4">
+        <ion-button (click)="removeSelectedItem()" color="orange" mode="ios" expand="block" type="button">Batalkan Pesanan</ion-button>
+      </div>
+    </ng-container>
+
+    <p *ngIf="orderItemsExted.length == 0">Semua pesanan sudah dikonfirmasi tidak bisa dibatalkan.</p>
   </div>
 </div>

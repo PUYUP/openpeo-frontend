@@ -10,12 +10,12 @@ import { finalize } from 'rxjs/operators';
 })
 export class OrderCancelComponent implements OnInit {
 
-  @Input() cart: any;
-  @Input() cart_items: any;
+  @Input() order: any;
+  @Input() order_items: any;
 
   removeItems: any = [];
   removeItemsSuccess: any = [];
-  cartItemsExted: any = [];
+  orderItemsExted: any = [];
 
   constructor(
     public modalCtrl: ModalController,
@@ -23,20 +23,24 @@ export class OrderCancelComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    for (let item of this.cart_items) {
+    for (let item of this.order_items) {
       item.is_removed = false;
-      this.cartItemsExted.push(item);
+      
+      // only pending status allow canceled
+      if (item.status == 'pending') {
+        this.orderItemsExted.push(item);
+      }
     }
   }
 
   removeItem(item: any): void {
-    const index = this.cartItemsExted.findIndex((x: any) => x.uuid === item.uuid);
+    const index = this.orderItemsExted.findIndex((x: any) => x.uuid === item.uuid);
 
     if ( item.is_removed == false) {
       this.removeItems.push(item);
-      this.cartItemsExted[index].is_removed = true;
+      this.orderItemsExted[index].is_removed = true;
     } else {
-      this.cartItemsExted[index].is_removed = false;
+      this.orderItemsExted[index].is_removed = false;
       this.removeItems =  this.removeItems.filter((x: any) => x.uuid !== item.uuid);
     }
   }
@@ -48,7 +52,7 @@ export class OrderCancelComponent implements OnInit {
   }
 
   removeItemObject(uuid: string): void {
-    this._orderService.removeItem(this.cart.uuid, uuid)
+    this._orderService.removeOrderItem(this.order.uuid, uuid)
       .pipe(
         finalize(() => {
           
@@ -58,13 +62,13 @@ export class OrderCancelComponent implements OnInit {
         (response: any) => {
           this.removeItemsSuccess.push(response);
 
-          this.cartItemsExted = this.removeItems.filter((x: any) => x.uuid !== uuid);
+          this.orderItemsExted = this.removeItems.filter((x: any) => x.uuid !== uuid);
 
-          if (this.removeItemsSuccess.length == this.removeItems.length && this.cartItemsExted.length > 0) {
+          if (this.removeItemsSuccess.length == this.removeItems.length && this.orderItemsExted.length > 0) {
             this.dismiss('removed');
           }
 
-          if (this.cartItemsExted.length == 0) {
+          if (this.orderItemsExted.length == 0) {
             this.dismiss('cleanup');
           }
         },

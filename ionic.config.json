@@ -1,5 +1,7 @@
 {
   "name": "openpeo",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

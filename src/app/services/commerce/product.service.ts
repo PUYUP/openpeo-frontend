@@ -139,9 +139,18 @@ export class ProductService {
     let url = this.url;
     let next = param?.next;
     let userUUID = param?.userUUID;
+    let latitude = param?.latitude;
+    let longitude = param?.longitude;
+    let radius = param?.radius;
+    let s = param?.s;
+
     let params = new HttpParams();
     
     if (userUUID) params=params.set('user_uuid', userUUID);
+    if (latitude) params=params.set('latitude', latitude);
+    if (longitude) params=params.set('longitude', longitude);
+    if (radius) params=params.set('radius', radius);
+    if (s) params=params.set('s', s);
     if (next) url = next;
 
     return this.httpClient.get(url, {withCredentials: true, params: params})
