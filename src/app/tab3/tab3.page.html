@@ -46,9 +46,11 @@
                 </div>
 
                 <div class="mt-auto pb-1 pt-1">
-                  <button type="button" class="b-0 text-red-500 flex items-center">
+                  <p *ngIf="item.note" class="text-sm text-gray-600 mb-1">{{ item.note }}</p>
+
+                  <button type="button" class="b-0 text-red-500 flex items-center" (click)="addNote(item, c)">
                     <ion-icon name="document-text-outline" class="mr-1"></ion-icon>
-                    <span class="text-sm">Beri Catatan</span>
+                    <span class="text-sm">{{ item.note? 'Rubah' : 'Beri' }} Catatan</span>
                   </button>
                 </div>
               </div>

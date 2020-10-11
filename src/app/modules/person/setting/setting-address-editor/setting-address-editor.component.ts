@@ -51,7 +51,7 @@ export class SettingAddressEditorComponent implements OnInit {
             this.addressSingle = response[0];
             
             this.formFactory.patchValue({
-              address: this.addressSingle.address,
+              address: this.addressSingle?.address,
             });
           }
         },

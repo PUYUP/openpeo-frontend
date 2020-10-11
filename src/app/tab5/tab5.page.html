@@ -9,8 +9,8 @@
 <ion-content [fullscreen]="true">
   <ion-item detail mode="ios" lines="full" routerLink="/setting/profile">
     <ion-avatar slot="start">
-      <img *ngIf="!credential.picture" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
-      <img *ngIf="credential.picture" src="{{ credential.picture }}" width="36" height="36">
+      <img *ngIf="!credential.picture_url" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
+      <img *ngIf="credential.picture_url" src="{{ credential.picture_url }}" width="36" height="36">
     </ion-avatar>
 
     <ion-label>

@@ -20,7 +20,7 @@
     </div>
 
     <div class="ml-auto">
-      <ion-button color="orange" class="m-0">Filter</ion-button>
+      <ion-button color="orange" class="m-0" (click)="showFilter()">Filter</ion-button>
     </div>
   </div>
 
@@ -35,9 +35,9 @@
   </div>
 
   <ion-list *ngIf="!isLoading && products" [ngStyle]="{'padding.px': '4'}">
-    <div *ngFor="let item of products" class="rounded overflow-hidden shadow shadow-sm bg-white p-3 mb-5 leading-normal" routerLink="/product/{{ item.uuid }}">
+    <div *ngFor="let item of products" class="rounded overflow-hidden shadow shadow-sm bg-white p-3 mb-5 leading-normal">
       <div class="flex items-center">
-        <div class="mr-3 w-32 h-auto">
+        <div class="mr-3 w-32 h-auto" routerLink="/product/{{ item.uuid }}">
           <div class="ratio-full">
             <div class="ratio-full-content">
               <img class="image-full rounded" src="{{ item.picture ? item.picture : 'assets/no-image.png' }}" alt="{{ item.name }}">
@@ -46,8 +46,16 @@
         </div>
 
         <div class="w-full">
-          <p class="text-gray-900 leading-5 mb-0" [ngStyle]="{'font-size.px': '15'}">{{ item.name }}</p>
-          <p class="text-gray-900 text-lg">Rp {{ item.price | number }}</p>
+          <div class="flex flex-grow">
+            <div routerLink="/product/{{ item.uuid }}">
+              <p class="text-gray-900 leading-5 mb-0" [ngStyle]="{'font-size.px': '15'}">{{ item.name }}</p>
+              <p class="text-gray-900 text-lg">Rp {{ item.price | number }}</p>
+            </div>
+
+            <div class="ml-auto">
+                <ion-icon name="heart" slot="icon-only" color="{{ item.is_wishlist ? 'orange': 'light' }}" (click)="markWishlist(item)"></ion-icon>
+            </div>
+          </div>
 
           <div class="flex flex-grow items-end mt-2">
             <div class="block">

@@ -89,7 +89,7 @@ export class DetailComponent implements OnInit {
     if (this.elNavigator && this.elNavigator.share) {
       this.elNavigator.share({
         title: 'Open Pe O',
-        text: 'Hay! Yuk belanja.',
+        text: `Beli ${this.product.name} ${document.location.href} di seller ${this.product.seller_name} Rp${this.product.price}`,
         url: document.location.href,
       })
       .then(() => console.log('Successful share'))

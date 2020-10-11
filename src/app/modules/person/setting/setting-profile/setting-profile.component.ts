@@ -6,6 +6,7 @@ import { EventService } from '../../../../services/event.service';
 import { finalize } from 'rxjs/operators';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { FcmService } from 'src/app/services/fcm.service';
 
 @Component({
   selector: 'app-setting-profile',
@@ -27,7 +28,8 @@ export class SettingProfileComponent implements OnInit {
     private _fb: FormBuilder,
     private _router: Router,
     private _authService: AuthService,
-    private _eventService: EventService
+    private _eventService: EventService,
+    private _fcmService: FcmService
   ) { }
 
   ngOnInit() {

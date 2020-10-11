@@ -14,6 +14,7 @@ export class ProductService {
   host: string = environment.host;
   private debug: boolean = environment.debug;
   url: string = this.host + '/api/commerce/products/';
+  urlWishlist: string = this.host + '/api/commerce/wishlists/';
 
   constructor(
     public alertController: AlertController,
@@ -143,6 +144,8 @@ export class ProductService {
     let longitude = param?.longitude;
     let radius = param?.radius;
     let s = param?.s;
+    let is_wishlist = param?.is_wishlist;
+    let is_active = param?.is_active;
 
     let params = new HttpParams();
     
@@ -151,6 +154,8 @@ export class ProductService {
     if (longitude) params=params.set('longitude', longitude);
     if (radius) params=params.set('radius', radius);
     if (s) params=params.set('s', s);
+    if (is_wishlist) params=params.set('is_wishlist', is_wishlist);
+    if (is_active) params=params.set('is_active', is_active);
     if (next) url = next;
 
     return this.httpClient.get(url, {withCredentials: true, params: params})
@@ -193,6 +198,36 @@ export class ProductService {
     }
 
     return this.httpClient.post(url, body, {withCredentials: true})
+      .pipe(
+        retry(3),
+        map((response: any) => {
+          return response;
+        }),
+        catchError(
+          (e: HttpErrorResponse) => this._handleError(e)
+        )
+      )
+  }
+
+
+  /****
+   * WishList...
+   */
+  wishlistCreate(context: any): Observable<any> {
+    return this.httpClient.post(this.urlWishlist, context, {withCredentials: true})
+      .pipe(
+        retry(3),
+        map((response: any) => {
+          return response;
+        }),
+        catchError(
+          (e: HttpErrorResponse) => this._handleError(e)
+        )
+      )
+  }
+
+  wishlistDelete(wishlistUUID: string): Observable<any> {
+    return this.httpClient.delete(this.urlWishlist + wishlistUUID + '/', {withCredentials: true})
       .pipe(
         retry(3),
         map((response: any) => {

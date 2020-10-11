@@ -16,6 +16,10 @@ import { DecimalPipe, registerLocaleData } from '@angular/common';
 import { CookieModule } from 'ngx-cookie';
 
 import localeId from '@angular/common/locales/id';  
+import { AngularFireDatabaseModule } from '@angular/fire/database';
+import { AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFireMessagingModule } from '@angular/fire/messaging';
+import { AngularFireModule } from '@angular/fire';
 registerLocaleData(localeId, 'id');
 
 @NgModule({
@@ -31,9 +35,12 @@ registerLocaleData(localeId, 'id');
       headerName: 'X-CSRFToken',
     }),
     AppRoutingModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
+    ServiceWorkerModule.register('combined-sw.js', { enabled: environment.production }),
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireMessagingModule
   ],
   providers: [
+    { provide: Window, useValue: window },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     CookieService,
     {

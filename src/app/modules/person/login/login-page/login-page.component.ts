@@ -5,6 +5,7 @@ import { AuthService } from '../../../../services/auth/auth.service';
 import { AlertController, NavController } from '@ionic/angular';
 import { finalize } from 'rxjs/operators';
 import { Location } from '@angular/common';
+import { FcmService } from 'src/app/services/fcm.service';
 
 @Component({
   selector: 'app-login-page',
@@ -22,6 +23,7 @@ export class LoginPageComponent implements OnInit {
     private _router: Router,
     private _authService: AuthService,
     private _location: Location,
+    private _fcmService: FcmService,
     public navCtrl: NavController,
     public alertController: AlertController
   ) { }
@@ -49,12 +51,32 @@ export class LoginPageComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.login(this.formFactory.value);
+    this.fcmRequestPermission();
   }
 
-  login(context: any, redirectTo: string = '/tabs/tab1'): void {
+  /**
+   * Get firebase token
+   */
+  fcmRequestPermission() {
+    this._fcmService.requestPermission()
+      .pipe(
+        finalize(() => {
+          // pass
+        })
+      )
+      .subscribe(
+        (token: any) => {
+          this.doLogin(this.formFactory.value, token);
+        },
+        (error: any) => {
+          this.doLogin(this.formFactory.value, '');
+        }
+      );
+  }
+
+  doLogin(context: any, fcmToken: string, redirectTo: string = '/tabs/tab1'): void {
     this.isLoading = true;
-    
+
     this._authService.login(context)
       .pipe(
         finalize(() => {
@@ -63,6 +85,10 @@ export class LoginPageComponent implements OnInit {
       )
       .subscribe(
         (response: any) => {
+          // save token to user
+          if (fcmToken) this._fcmService.setFcmToken(fcmToken);
+
+          // redirect to...
           this._router.navigate([redirectTo], {replaceUrl: true});
         },
         (failure: any) => {

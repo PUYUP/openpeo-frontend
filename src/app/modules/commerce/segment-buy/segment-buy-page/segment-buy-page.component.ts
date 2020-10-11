@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertController, IonInfiniteScroll } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonInfiniteScroll } from '@ionic/angular';
 import { finalize } from 'rxjs/operators';
 
 import { ProductService } from '../../../../services/commerce/product.service';
@@ -50,7 +50,8 @@ export class SegmentBuyPageComponent implements OnInit {
   constructor(
     private _productService: ProductService,
     private _authService: AuthService,
-    public alertController: AlertController
+    public alertController: AlertController,
+    public actionSheetController: ActionSheetController
   ) { }
 
   async presentAlertPrompt() {
@@ -90,10 +91,88 @@ export class SegmentBuyPageComponent implements OnInit {
     await alert.present();
   }
 
+  async presentFilterSheet() {
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Filter',
+      cssClass: 'my-custom-class',
+      buttons: [
+        {
+          text: 'Semua',
+          icon: 'list-outline',
+          handler: () => {
+            this.loadProductsSearch({});
+          }
+        },
+        {
+          text: 'Wishlist',
+          icon: 'heart',
+          handler: () => {
+            this.loadProductsSearch({'is_wishlist': '1'});
+          }
+        }, 
+        {
+          text: 'Toko Buka',
+          icon: 'medical',
+          handler: () => {
+            this.loadProductsSearch({'is_active': '1'});
+          }
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  }
+
   ngOnInit() {
     this.credential = this._authService.getCredential();
     this.userUUID = (this.credential ? this.credential.uuid : '');
     this.loadProducts({});
+  }
+
+  showFilter() {
+    this.presentFilterSheet();
+  }
+
+  markWishlist(item: any) {
+    if (item.is_wishlist) {
+      this.removeWishlist(item.wishlist_uuid);
+    } else {
+      this.createWishlist(item.id);
+    }
+  }
+
+  createWishlist(product_id: number) {
+    this._productService.wishlistCreate({'product': product_id})
+      .pipe(
+        finalize(() => {
+          // pass
+        })
+      )
+      .subscribe(
+        (response: any) => {
+          const index = this.products.findIndex((p: any) => p.id == product_id);
+
+          this.products[index].is_wishlist = true;
+          this.products[index].wishlist_uuid = response.uuid;
+        }
+      )
+  }
+
+  removeWishlist(wishlistUUID: string) {
+    this._productService.wishlistDelete(wishlistUUID)
+      .pipe(
+        finalize(() => {
+          // pass
+        })
+      )
+      .subscribe(
+        (response: any) => {
+          const index = this.products.findIndex((p: any) => p.wishlist_uuid == wishlistUUID);
+          
+          this.products[index].is_wishlist = false;
+          this.products[index].wishlist_uuid = null;
+        }
+      )
   }
 
   getLocation() {
@@ -138,7 +217,14 @@ export class SegmentBuyPageComponent implements OnInit {
     if (!isLoadMore) this.isLoading = true;
     let next = this.next;
 
-    this._productService.list({'next': next, 'latitude': latitude, 'longitude': longitude, 'radius': radius})
+    const finalParam = {
+      'next': next, 
+      'latitude': latitude, 
+      'longitude': longitude, 
+      'radius': radius, 
+    }
+
+    this._productService.list(finalParam)
       .pipe(
         finalize(() => {
           this.isLoading = false;
@@ -182,8 +268,19 @@ export class SegmentBuyPageComponent implements OnInit {
     let longitude = params?.longitude;
     let radius = params?.radius;
     let s = params?.s;
+    let is_wishlist = params?.is_wishlist;
+    let is_active = params?.is_active;
+
+    const finalParam = {
+      'latitude': latitude, 
+      'longitude': longitude, 
+      'radius': radius, 
+      's': s, 
+      'is_wishlist': is_wishlist,
+      'is_active': is_active
+    }
   
-    this._productService.list({'latitude': latitude, 'longitude': longitude, 'radius': radius, 's': s})
+    this._productService.list(finalParam)
       .pipe(
         finalize(() => {
           this.isLoading = false;
